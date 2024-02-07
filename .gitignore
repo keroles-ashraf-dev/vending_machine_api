@@ -3,5 +3,6 @@ dist
 build
 npm-debug.log
 .nyc
-.env*
+.env.dev
+.env.prod
 .DS_Store
