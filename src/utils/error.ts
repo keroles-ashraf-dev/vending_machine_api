@@ -1,0 +1,56 @@
+import { Response } from "express";
+import { env } from "src/config/app.config";
+import { ErrorType, HttpStatusCode } from "./type";
+import { envDev } from "./constant";
+import apiRes from "./api.response";
+
+class BaseError extends Error {
+    name: string;
+    code: HttpStatusCode;
+    message: string;
+    isOperational: boolean;
+
+    constructor(
+        name: string,
+        code: HttpStatusCode,
+        message: string,
+        isOperational: boolean,
+    ) {
+        super(message);
+        this.name = name;
+        this.code = code;
+        this.message = message;
+        this.isOperational = isOperational;
+
+        Error.captureStackTrace(this);
+    }
+}
+
+export class ApiError extends BaseError {
+    constructor(
+        name: string,
+        code: HttpStatusCode,
+        message: string,
+        isOperational: boolean,
+    ) {
+        super(name, code, message, isOperational);
+    }
+}
+
+export function errorHandler(res: Response, error: Error): Response {
+    if (env != envDev) {
+        // its not development enviroment
+        if (error.name == ErrorType.SECURITY_ERROR) {
+            // maybe this one should be send to (email, slack, etc)
+            error.message = 'Something wrong happend, try again later';
+        } else {
+            error.stack = null;
+        }
+    }
+
+    if (error instanceof ApiError) {
+        return apiRes(res, error.code, error.name, error.message, { error_stack: error.stack });
+    } else {
+        return apiRes(res, HttpStatusCode.INTERNAL_SERVER_ERROR, error.name, error.message, { error_stack: error.stack });
+    }
+}

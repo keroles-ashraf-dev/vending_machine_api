@@ -1,6 +1,6 @@
-import winston, { loggers } from "winston";
+import winston from "winston";
 import { log_file_path, env } from '../config/app.config';
-import { envDev } from '../util/constant';
+import { envDev } from '../utils/constant';
 
 // logging format => date + logger level + message + {obj}
 
@@ -50,6 +50,15 @@ class LoggerService {
         }
         else {
             this.logger.log('debug', msg, obj);
+        }
+    }
+
+    async warning(msg: string, obj: object = null) {
+        if (obj == null) {
+            this.logger.log('warning', msg);
+        }
+        else {
+            this.logger.log('warning', msg, obj);
         }
     }
 
