@@ -7,9 +7,9 @@ import LoggerService from 'src/services/logger';
 import Coin from 'app/models/coin.model';
 import connection from '../../../db/connection';
 
-const logger = new LoggerService('deposition.controller');
+const logger = new LoggerService('purchase.controller');
 
-async function deposit(req: Request, res: Response, next: NextFunction) {
+async function buy(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = req.body._id;
         const amount: number = req.body.amount;
@@ -160,6 +160,5 @@ async function reset(req: Request, res: Response, next: NextFunction) {
 }
 
 export default {
-    deposit,
-    reset,
+    buy,
 }
