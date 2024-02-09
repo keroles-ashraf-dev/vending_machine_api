@@ -1,111 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import User from 'app/models/user.model';
 import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode } from 'src/utils/type';
+import { ErrorType, HttpStatusCode, UserRole } from 'src/utils/type';
 import apiRes from 'src/utils/api.response';
 import LoggerService from 'src/services/logger';
+import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
 
-const logger = new LoggerService('user.controller');
-
-async function createUser(req: Request, res: Response, next: NextFunction) {
-    try {
-        const username: string = req.body.username;
-        const password: string = req.body.password;
-        const role: string = req.body.role;
-
-        const isUsernameExist = await User.findOne({ where: { username: username } });
-
-        if (isUsernameExist) {
-            throw new ApiError(
-                ErrorType.GENERAL_ERROR,
-                HttpStatusCode.OK,
-                'Username is exist', true
-            );
-        }
-
-        const user = await User.create({
-            username: username,
-            password: password,
-            role: role,
-        });
-
-        if (!user) {
-            throw new ApiError(
-                ErrorType.UNKNOWN_ERROR,
-                HttpStatusCode.INTERNAL_SERVER_ERROR,
-                'User not created. something wrong happend, try again later', true
-            );
-        }
-
-        const data = {
-            id: user.id,
-            username: user.username,
-            role: user.role,
-        }
-
-        return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user created', null, data);
-    } catch (err) {
-        logger.error('User creating error', err);
-        return errorHandler(res, err);
+class UserController {
+    private static _instance: UserController;
+    public static get Instance() {
+        return this._instance || (this._instance = new this(
+            new LoggerService('user.controller'), UserRepo,
+        ));
     }
-}
-
-async function getUser(req: Request, res: Response, next: NextFunction) {
-    try {
-        const userId = req.body._id;
-
-        const user = await User.findOne({ where: { id: userId } });
-
-        if (!user) {
-            throw new ApiError(
-                ErrorType.SECURITY_ERROR,
-                HttpStatusCode.FORBIDDEN,
-                'User not found in db after authentication succeeded',
-                true
-            );
-        }
-
-        const data = {
-            username: user.username,
-            role: user.role,
-            deposit: user.deposit,
-        }
-
-        return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user fetched', null, data);
-    } catch (err) {
-        logger.error('User fetching error', err);
-        return errorHandler(res, err);
+    private constructor(logger: LoggerService, userRepo: BaseUserRepo) {
+        this.logger = logger;
+        this.userRepo = userRepo;
     }
-}
 
-async function updateUser(req: Request, res: Response, next: NextFunction) {
-    try {
-        const userId = req.body._id;
-        const username = req.body.username;
-        const password = req.body.password;
+    logger: LoggerService;
+    userRepo: BaseUserRepo;
 
-        if (!username && !password) {
-            throw new ApiError(
-                ErrorType.GENERAL_ERROR,
-                HttpStatusCode.OK,
-                'Nothing to update', true
-            );
-        }
+    async createUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const username: string = req.body.username;
+            const password: string = req.body.password;
+            const role: string = req.body.role;
 
-        const user = await User.findOne({ where: { id: userId } });
-
-        if (!user) {
-            throw new ApiError(
-                ErrorType.SECURITY_ERROR,
-                HttpStatusCode.FORBIDDEN,
-                'User not found in db after authentication succeeded',
-                true
-            );
-        }
-
-        if (username) {
-            const isUsernameExist = await User.findOne({ where: { username: username } });
+            const isUsernameExist = await this.userRepo.findOne({ where: { username: username } });
 
             if (isUsernameExist) {
                 throw new ApiError(
@@ -115,83 +37,172 @@ async function updateUser(req: Request, res: Response, next: NextFunction) {
                 );
             }
 
-            user.username = username;
+            const userData = {
+                username: username,
+                password: password,
+                role: role,
+            }
+
+            const user = await this.userRepo.create(userData);
+
+            if (!user) {
+                throw new ApiError(
+                    ErrorType.UNKNOWN_ERROR,
+                    HttpStatusCode.INTERNAL_SERVER_ERROR,
+                    'User not created. something wrong happend, try again later', true
+                );
+            }
+
+            const resData = {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+            }
+
+            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user created', null, resData);
+        } catch (err) {
+            this.logger.error('User creating error', err);
+            return errorHandler(res, err);
         }
+    }
 
-        if (password) {
-            user.password = password;
+    async getUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.body._id;
+
+            const user = await this.userRepo.findOne({ where: { id: userId } });
+
+            if (!user) {
+                throw new ApiError(
+                    ErrorType.SECURITY_ERROR,
+                    HttpStatusCode.FORBIDDEN,
+                    'User not found in db after authentication succeeded',
+                    true
+                );
+            }
+
+            const resData = {
+                username: user.username,
+                role: user.role,
+                deposit: user.deposit,
+            }
+
+            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user fetched', null, resData);
+        } catch (err) {
+            this.logger.error('User fetching error', err);
+            return errorHandler(res, err);
         }
+    }
 
-        const modifiedUser = await user.save();
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.body._id;
+            const username = req.body.username;
+            const password = req.body.password;
 
-        if (!modifiedUser) {
-            throw new ApiError(
-                ErrorType.UNKNOWN_ERROR,
-                HttpStatusCode.INTERNAL_SERVER_ERROR,
-                'User not updated. something wrong happend, try again later', true
-            );
+            if (!username && !password) {
+                throw new ApiError(
+                    ErrorType.GENERAL_ERROR,
+                    HttpStatusCode.OK,
+                    'Nothing to update', true
+                );
+            }
+
+            const user = await this.userRepo.findOne({ where: { id: userId } });
+
+            if (!user) {
+                throw new ApiError(
+                    ErrorType.SECURITY_ERROR,
+                    HttpStatusCode.FORBIDDEN,
+                    'User not found in db after authentication succeeded',
+                    true
+                );
+            }
+
+            const userData = {};
+
+            if (username) {
+                const isUsernameExist = await this.userRepo.findOne({ where: { username: username } });
+
+                if (isUsernameExist) {
+                    throw new ApiError(
+                        ErrorType.GENERAL_ERROR,
+                        HttpStatusCode.OK,
+                        'Username is exist', true
+                    );
+                }
+
+                userData['username'] = username;
+            }
+
+            if (password) {
+                userData['password'] = password;
+            }
+
+            const modifiedUser = await this.userRepo.update(user, userData);
+
+            if (!modifiedUser) {
+                throw new ApiError(
+                    ErrorType.UNKNOWN_ERROR,
+                    HttpStatusCode.INTERNAL_SERVER_ERROR,
+                    'User not updated. something wrong happend, try again later', true
+                );
+            }
+
+            const resData = {
+                id: modifiedUser.id,
+                username: modifiedUser.username,
+                role: modifiedUser.role,
+            }
+
+            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user updated', null, resData);
+        } catch (err) {
+            this.logger.error('User updating error', err);
+            return errorHandler(res, err);
         }
+    }
 
-        const data = {
-            id: modifiedUser.id,
-            username: modifiedUser.username,
-            role: modifiedUser.role,
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.body._id;
+            const password = req.body.password;
+
+            const user = await this.userRepo.findOne({ where: { id: userId } });
+
+            if (!user) {
+                throw new ApiError(
+                    ErrorType.SECURITY_ERROR,
+                    HttpStatusCode.FORBIDDEN,
+                    'User not found in db after authentication succeeded',
+                    true
+                );
+            }
+
+            if (!(await bcrypt.compare(password, user.password))) {
+                throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.FORBIDDEN, 'Invalid password', true);
+            }
+
+            const deleted = await this.userRepo.delete({ where: { id: user.id } });
+
+            if (!deleted) {
+                throw new ApiError(
+                    ErrorType.UNKNOWN_ERROR,
+                    HttpStatusCode.INTERNAL_SERVER_ERROR,
+                    'User not deleted. try again later',
+                    true
+                );
+            }
+
+            const resData = {
+                username: user.username,
+            }
+
+            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user deleted', null, resData);
+        } catch (err) {
+            this.logger.error('User deleting error', err);
+            return errorHandler(res, err);
         }
-
-        return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user updated', null, data);
-    } catch (err) {
-        logger.error('User updating error', err);
-        return errorHandler(res, err);
     }
 }
 
-async function deleteUser(req: Request, res: Response, next: NextFunction) {
-    try {
-        const userId = req.body._id;
-        const password = req.body.password;
-
-        const user = await User.findOne({ where: { id: userId } });
-
-        if (!user) {
-            throw new ApiError(
-                ErrorType.SECURITY_ERROR,
-                HttpStatusCode.FORBIDDEN,
-                'User not found in db after authentication succeeded',
-                true
-            );
-        }
-
-        if (!(await bcrypt.compare(password, user.password))) {
-            throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.FORBIDDEN, 'Invalid password', true);
-        }
-
-        await user.destroy();
-
-        const deletedUser = await User.findOne({ where: { id: user.id } });
-
-        if (deletedUser) {
-            throw new ApiError(
-                ErrorType.UNKNOWN_ERROR,
-                HttpStatusCode.INTERNAL_SERVER_ERROR,
-                'User not deleted. try again later',
-                true
-            );
-        }
-
-        const data = {
-            username: user.username,
-        }
-
-        return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user deleted', null, data);
-    } catch (err) {
-        logger.error('User deleting error', err);
-        return errorHandler(res, err);
-    }
-}
-
-export default {
-    createUser,
-    getUser,
-    updateUser,
-    deleteUser,
-}
+export default UserController.Instance;

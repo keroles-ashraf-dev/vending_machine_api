@@ -6,7 +6,7 @@ import { UserRole } from 'src/utils/type';
 
 const router = Router();
 
-router.post('/deposition/deposit', authenticate, authorize([UserRole.BUYER]), depositionCtrl.deposit);
-router.get('/deposition/reset', authenticate, authorize([UserRole.BUYER]), depositionCtrl.reset);
+router.post('/deposit', authenticate, authorize([UserRole.BUYER]), depositionCtrl.deposit);
+router.get('/reset', authenticate, authorize([UserRole.BUYER]), depositionCtrl.reset);
 
 export default router;

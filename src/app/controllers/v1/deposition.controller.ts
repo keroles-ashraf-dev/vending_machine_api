@@ -1,165 +1,152 @@
 import { Request, Response, NextFunction } from 'express';
-import User from 'app/models/user.model';
 import { ApiError, errorHandler } from 'src/utils/error';
 import { ErrorType, HttpStatusCode } from 'src/utils/type';
 import apiRes from 'src/utils/api.response';
 import LoggerService from 'src/services/logger';
-import Coin from 'app/models/coin.model';
 import connection from '../../../db/connection';
+import { calcUserDepositAndChange, isDepositionAmountValid } from 'src/helpers/user.deposit';
+import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
+import CoinRepo, { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
 
-const logger = new LoggerService('deposition.controller');
+class DepositionController {
+    private static _instance: DepositionController;
+    public static get Instance() {
+        return this._instance || (this._instance = new this(
+            new LoggerService('deposition.controller'),
+            ProductRepo,
+            UserRepo,
+            CoinRepo,
+        ));
+    }
+    private constructor(
+        logger: LoggerService,
+        productRepo: BaseProductRepo,
+        userRepo: BaseUserRepo,
+        coinRepo: BaseCoinRepo,
+    ) {
+        this.logger = logger;
+        this.productRepo = productRepo;
+        this.userRepo = userRepo;
+        this.coinRepo = coinRepo;
+    }
 
-async function deposit(req: Request, res: Response, next: NextFunction) {
-    try {
-        const userId = req.body._id;
-        const amount: number = req.body.amount;
+    logger: LoggerService;
+    productRepo: BaseProductRepo;
+    userRepo: BaseUserRepo;
+    coinRepo: BaseCoinRepo;
 
-        const user = await User.findOne({ where: { id: userId } });
+    async deposit(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userId = req.body._id;
+            const amount: number = req.body.amount;
 
-        if (!user) {
-            throw new ApiError(
-                ErrorType.SECURITY_ERROR,
-                HttpStatusCode.FORBIDDEN,
-                'User not found in db after authentication succeeded',
-                true
-            );
-        }
+            const user = await this.userRepo.findOne({ where: { id: userId } });
 
-        const coins = await Coin.findAll();
-
-        let isValidAmount: boolean = false;
-        for (let i = 0; i < coins.length; i++) {
-            const coin = coins[i];
-
-            if (amount == coin.amount) {
-                isValidAmount = true;
-                break;
+            if (!user) {
+                throw new ApiError(
+                    ErrorType.SECURITY_ERROR,
+                    HttpStatusCode.FORBIDDEN,
+                    'User not found in db after authentication succeeded',
+                    true
+                );
             }
+
+            const coins = await this.coinRepo.findAll({});
+
+            if (!isDepositionAmountValid(coins, amount)) {
+                throw new ApiError(
+                    ErrorType.GENERAL_ERROR,
+                    HttpStatusCode.UNPROCESSABLE_CONTENT,
+                    'Deposition not succeeded. amount is not valid',
+                    true
+                );
+            }
+
+            const newDeposit = user.deposit + amount;
+
+            const modifiedUser = await this.userRepo.update(user, { deposit: newDeposit });
+
+            if (!modifiedUser || modifiedUser.deposit != newDeposit) {
+                throw new ApiError(
+                    ErrorType.UNKNOWN_ERROR,
+                    HttpStatusCode.INTERNAL_SERVER_ERROR,
+                    'Deposition not succeeded. something wrong happend, try again later', true
+                );
+            }
+
+            const resData = {
+                username: modifiedUser.username,
+                deposit_amount: modifiedUser.deposit,
+            }
+
+            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully deposition', null, resData);
+        } catch (err) {
+            this.logger.error('Deposition error', err);
+            return errorHandler(res, err);
         }
+    }
 
-        if (!isValidAmount) {
-            throw new ApiError(
-                ErrorType.GENERAL_ERROR,
-                HttpStatusCode.UNPROCESSABLE_CONTENT,
-                'Deposition not succeeded. amount is not valid',
-                true
-            );
+    async reset(req: Request, res: Response, next: NextFunction) {
+        // First, start a transaction
+        const trans = await connection.transaction();
+
+        try {
+            const userId = req.body._id;
+
+            const user = await this.userRepo.findOne({ where: { id: userId } });
+
+            if (!user) {
+                throw new ApiError(
+                    ErrorType.SECURITY_ERROR,
+                    HttpStatusCode.FORBIDDEN,
+                    'User not found in db after authentication succeeded',
+                    true
+                );
+            }
+
+            if (user.deposit <= 0) {
+                throw new ApiError(
+                    ErrorType.GENERAL_ERROR,
+                    HttpStatusCode.NOT_FOUND,
+                    'You do not have anyy deposits to reset',
+                    true
+                );
+            }
+
+            const coins = await this.coinRepo.findAll({ order: ['amount', 'DESC'] });
+
+            // read function doc
+            const { userDeposit, returnedCoins } = calcUserDepositAndChange(coins, user.deposit);
+
+            const modifiedUser = await this.userRepo.update(user, { deposit: userDeposit });
+
+            if (!modifiedUser || modifiedUser.deposit != userDeposit) {
+                throw new ApiError(
+                    ErrorType.UNKNOWN_ERROR,
+                    HttpStatusCode.INTERNAL_SERVER_ERROR,
+                    'Deposition resetting not succeeded. something wrong happend, try again later', true
+                );
+            }
+
+            const resData = {
+                username: modifiedUser.username,
+                returned_amount: returnedCoins,
+                deposit_reminder: user.deposit,
+            }
+
+            // commit the transaction.
+            await trans.commit();
+
+            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully deposition reset', null, resData);
+        } catch (err) {
+            // rollback the transaction.
+            await trans.rollback();
+
+            this.logger.error('Deposition resetting error', err);
+            return errorHandler(res, err);
         }
-
-        const newDeposit = user.deposit + amount;
-
-        user.deposit = newDeposit;
-
-        const modifiedUser = await user.save();
-
-        if (!modifiedUser || modifiedUser.deposit != newDeposit) {
-            throw new ApiError(
-                ErrorType.UNKNOWN_ERROR,
-                HttpStatusCode.INTERNAL_SERVER_ERROR,
-                'Deposition not succeeded. something wrong happend, try again later', true
-            );
-        }
-
-        const data = {
-            username: modifiedUser.username,
-            deposit_amount: modifiedUser.deposit,
-        }
-
-        return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully deposition', null, data);
-    } catch (err) {
-        logger.error('Deposition error', err);
-        return errorHandler(res, err);
     }
 }
 
-async function reset(req: Request, res: Response, next: NextFunction) {
-    // First, start a transaction
-    const trans = await connection.transaction();
-
-    try {
-        const userId = req.body._id;
-
-        const user = await User.findOne({ where: { id: userId } });
-
-        if (!user) {
-            throw new ApiError(
-                ErrorType.SECURITY_ERROR,
-                HttpStatusCode.FORBIDDEN,
-                'User not found in db after authentication succeeded',
-                true
-            );
-        }
-
-        let userDeposit = user.deposit;
-
-        if (userDeposit == 0) {
-            throw new ApiError(
-                ErrorType.GENERAL_ERROR,
-                HttpStatusCode.NOT_FOUND,
-                'You do not have anyy deposits to reset',
-                true
-            );
-        }
-
-        const coins = await Coin.findAll({ order: ['amount', 'DESC'] });
-
-        const returnedCoins: number[] = [];
-
-        /**
-         * we need to tell the machine by sequance the coins it has to returned
-         * so we just loop on available coins (descendingly) 
-         * and get how many times of user deposit in current coin amount (say $n)
-         * then add coin amount to returned array for ($n) times
-         * and set user deposit to the reminder from current itration
-         */
-        for (let i = 0; i < coins.length; i++) {
-            const coin = coins[i];
-
-            if (userDeposit >= coin.amount) {
-                const times = userDeposit / coin.amount; // times of coin amount in user deposite ($n)
-                const reminder = userDeposit % coin.amount; // reminder of modulus user deposite and coin amount
-
-                // add coin amount n times to returned coins
-                const arrayOfCoinAmount = Array<number>(times).fill(coin.amount);
-                returnedCoins.push(...arrayOfCoinAmount);
-
-                // set user deposit to reminder
-                userDeposit = reminder;
-            }
-        }
-
-        user.deposit = userDeposit;
-
-        const modifiedUser = await user.save();
-
-        if (!modifiedUser || modifiedUser.deposit != userDeposit) {
-            throw new ApiError(
-                ErrorType.UNKNOWN_ERROR,
-                HttpStatusCode.INTERNAL_SERVER_ERROR,
-                'Deposition resetting not succeeded. something wrong happend, try again later', true
-            );
-        }
-
-        const data = {
-            username: modifiedUser.username,
-            returned_amount: returnedCoins,
-            deposit_reminder: user.deposit,
-        }
-
-        // commit the transaction.
-        await trans.commit();
-
-        return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully deposition reset', null, data);
-    } catch (err) {
-        // rollback the transaction.
-        await trans.rollback();
-
-        logger.error('Deposition resetting error', err);
-        return errorHandler(res, err);
-    }
-}
-
-export default {
-    deposit,
-    reset,
-}
+export default DepositionController.Instance;

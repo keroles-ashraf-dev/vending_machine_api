@@ -19,7 +19,7 @@ class LoggerService {
         this.logger = winston.createLogger({
             level: 'info',
             format: winston.format.printf(info => {
-                let msg = dateFormat + ' | ' + info.level.toUpperCase + ' | ' + info.message;
+                let msg = dateTimeFormat + ' | ' + info.level.toUpperCase + ' | ' + info.message;
                 msg = info.obj ? msg + ' | ' + JSON.stringify(info.obj) : msg;
                 return msg;
             }),

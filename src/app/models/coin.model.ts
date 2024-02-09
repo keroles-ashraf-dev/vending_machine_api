@@ -2,16 +2,11 @@ import { Model, DataTypes } from 'sequelize';
 import conn from '../../db/connection';
 
 export default class Coin extends Model {
-    declare name: string;
-    declare amount: number;
+    declare value: number;
 }
 
 Coin.init({
-    name: {
-        type: DataTypes.STRING(24),
-        unique: true,
-    },
-    amount: {
+    value: {
         type: DataTypes.INTEGER,
         unique: true,
     },
