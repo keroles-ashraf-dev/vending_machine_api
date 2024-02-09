@@ -3,8 +3,8 @@ import { ApiError, errorHandler } from 'src/utils/error';
 import { ErrorType, HttpStatusCode, UserRole } from 'src/utils/type';
 import apiRes from 'src/utils/api.response';
 import LoggerService from 'src/services/logger';
-import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
-import userRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import ProductRepo, { BaseProductRepo } from 'src/app/repositories/v1/product.repo';
+import userRepo, { BaseUserRepo } from 'src/app/repositories/v1/user.repo';
 
 class ProductController {
     private static _instance: ProductController;

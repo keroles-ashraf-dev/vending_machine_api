@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import userCtrl from 'app/controllers/v1/user.controller'
-import validate from 'app/middelwares/validate';
-import { createSchema, updateSchema, deleteSchema } from 'app/validations/user.validation';
-import authenticate from 'app/middelwares/authenticate';
+import userCtrl from 'src/app/controllers/v1/user.controller'
+import validate from 'src/app/middelwares/validate';
+import { createSchema, updateSchema, deleteSchema } from 'src/app/validations/user.validation';
+import authenticate from 'src/app/middelwares/authenticate';
 
 const router = Router();
 

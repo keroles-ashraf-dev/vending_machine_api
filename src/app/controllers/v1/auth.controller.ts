@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode } from 'src/utils/type';
-import JWT from 'src/services/jwt';
-import apiRes from 'src/utils/api.response';
-import LoggerService from 'src/services/logger';
+import { ApiError, errorHandler } from 'utils/error';
+import { ErrorType, HttpStatusCode } from 'utils/type';
+import JWT from 'services/jwt';
+import apiRes from 'utils/api.response';
+import LoggerService from 'services/logger';
 import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
 import UserRefreshTokenRepo, { BaseUserRefreshTokenRepo } from 'app/repositories/v1/user.refresh.token.repo';
 

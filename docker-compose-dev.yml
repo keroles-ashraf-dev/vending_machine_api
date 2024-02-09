@@ -8,10 +8,12 @@ services:
       - .env.dev
     ports:
       - "3000:3000"
-    networks:
-      - backend
     volumes:
       - ./src:/app/src:ro
+    networks:
+      - backend
+    depends_on:
+      - postgres
   nginx:
     container_name: nginx_container
     image: nginx:stable-alpine
@@ -25,6 +27,7 @@ services:
     depends_on:
       - app
   postgres:
+    container_name: postgres_container
     image: postgres:15.5
     environment:
       POSTGRES_DB: "${DB_NAME}"

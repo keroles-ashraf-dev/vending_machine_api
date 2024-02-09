@@ -3,8 +3,8 @@ import { UserRole } from "src/utils/type";
 
 export const createSchema = Joi.object({
     username: Joi.string().min(1).max(64).required(),
-    password: Joi.string().min(8).max(24).required(),
-    role: Joi.string().valid(Object.values(UserRole)),
+    password: Joi.string().min(8).max(24).required(), 
+    role: Joi.string().valid(...Object.values(UserRole)),
 });
 
 export const updateSchema = Joi.object({

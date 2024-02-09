@@ -51,4 +51,4 @@ UserRefreshToken.init({
     timestamps: false
 });
 
-UserRefreshToken.belongsTo(User, { foreignKey: 'userId', targetKey: 'id', foreignKeyConstraint: true, onUpdate: 'CASCADE', onDelete: 'CASCADE' });
+// UserRefreshToken.belongsTo(User, { foreignKey: 'userId', targetKey: 'id', foreignKeyConstraint: true, onUpdate: 'CASCADE', onDelete: 'CASCADE' });

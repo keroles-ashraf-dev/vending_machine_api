@@ -1,5 +1,5 @@
-import User from 'app/models/user.model';
-import UserRefreshToken from 'app/models/user.refresh.token.model';
+import User from 'src/app/models/user.model';
+import UserRefreshToken from 'src/app/models/user.refresh.token.model';
 
 export interface BaseUserRefreshTokenRepo {
     create(user: User): Promise<string>;

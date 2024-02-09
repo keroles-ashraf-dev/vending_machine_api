@@ -1,4 +1,4 @@
-import User from 'app/models/user.model';
+import User from 'src/app/models/user.model';
 
 export interface BaseUserRepo {
     create(data: any): Promise<User>;

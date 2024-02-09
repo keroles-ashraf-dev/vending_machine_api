@@ -41,8 +41,8 @@ User.init({
     timestamps: false
 });
 
-User.hasMany(Product, { foreignKey: 'sellerId' });
-User.hasOne(UserRefreshToken, { foreignKey: 'userId' });
+// User.hasMany(Product, { foreignKey: 'sellerId' });
+// User.hasOne(UserRefreshToken, { foreignKey: 'userId' });
 
 User.beforeSave(async (user: User, options: CreateOptions) => {
     if (user.changed('password')) {

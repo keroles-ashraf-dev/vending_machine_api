@@ -1,7 +1,9 @@
-import Coin from 'app/models/coin.model';
+import Coin from 'src/app/models/coin.model';
 
 export interface BaseCoinRepo {
     create(data: any): Promise<Coin>;
+
+    createBulk(data: Array<any>): Promise<Coin[]>;
 
     findAll(query: any): Promise<Coin[]>;
 }
@@ -18,6 +20,12 @@ class CoinRepo implements BaseCoinRepo {
         const coin = await Coin.create(data);
 
         return coin;
+    }
+
+    async createBulk(data: Array<any>): Promise<Coin[]> {
+        const coins = await Coin.bulkCreate(data);
+
+        return coins;
     }
 
     async findAll(query: any): Promise<Coin[]> {

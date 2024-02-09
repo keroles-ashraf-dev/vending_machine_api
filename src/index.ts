@@ -1,9 +1,9 @@
-import app from 'app/app'
-import { port } from './config/app.config';
-import LoggerService from './services/logger';
-import connection from './db/connection';
+import app from './app/app'
+import { port } from 'config/app.config';
+import LoggerService from 'services/logger';
+import connection from 'db/connection';
 
-const logger = new LoggerService('jwt');
+const logger = new LoggerService('index');
 
 function start(): void {
     try {
@@ -12,8 +12,8 @@ function start(): void {
 
             logger.info('Server started on port ' + port);
         });
-    } catch (err) {
-        logger.error('Start server', err);
+    } catch (err) { 
+        logger.error('Start server', err); 
         process.exit(1);
     }
 };

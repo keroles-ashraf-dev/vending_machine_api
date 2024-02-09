@@ -41,4 +41,4 @@ Product.init({
     timestamps: false
 });
 
-Product.belongsTo(User, { foreignKey: 'sellerId', targetKey: 'id', foreignKeyConstraint: true, onUpdate: 'CASCADE', onDelete: 'CASCADE' });
+//Product.belongsTo(User, { foreignKey: 'sellerId', targetKey: 'id', foreignKeyConstraint: true, onUpdate: 'CASCADE', onDelete: 'CASCADE' });

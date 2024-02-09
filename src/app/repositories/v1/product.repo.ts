@@ -1,4 +1,4 @@
-import Product from 'app/models/product.model';
+import Product from 'src/app/models/product.model';
 
 export interface BaseProductRepo {
     create(data: any): Promise<Product>;

@@ -4,7 +4,7 @@ import { ApiError, errorHandler } from 'src/utils/error';
 import { ErrorType, HttpStatusCode, UserRole } from 'src/utils/type';
 import apiRes from 'src/utils/api.response';
 import LoggerService from 'src/services/logger';
-import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import UserRepo, { BaseUserRepo } from 'src/app/repositories/v1/user.repo';
 
 class UserController {
     private static _instance: UserController;

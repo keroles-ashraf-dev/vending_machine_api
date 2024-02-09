@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { env } from "src/config/app.config";
+import { env } from "../config/app.config";
 import { ErrorType, HttpStatusCode } from "./type";
 import { envDev } from "./constant";
 import apiRes from "./api.response";

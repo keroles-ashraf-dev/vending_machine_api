@@ -5,9 +5,9 @@ import apiRes from 'src/utils/api.response';
 import LoggerService from 'src/services/logger';
 import connection from '../../../db/connection';
 import { calcUserDepositAndChange } from 'src/helpers/user.deposit';
-import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
-import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
-import CoinRepo, { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
+import UserRepo, { BaseUserRepo } from 'src/app/repositories/v1/user.repo';
+import ProductRepo, { BaseProductRepo } from 'src/app/repositories/v1/product.repo';
+import CoinRepo, { BaseCoinRepo } from 'src/app/repositories/v1/coin.repo';
 
 class PurchaseController {
     private static _instance: PurchaseController;

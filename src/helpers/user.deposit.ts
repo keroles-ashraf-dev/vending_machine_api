@@ -1,4 +1,4 @@
-import Coin from "app/models/coin.model";
+import Coin from "src/app/models/coin.model";
 
 /**
     * we need to tell the machine "by sequance" the coins it has to returned
