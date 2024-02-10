@@ -2,15 +2,12 @@
 
 ## Usage:
 
+> Postman collection available in root dir.<br/>
+
 ### With docker
 
-1- build image
 ```console
-docker build -t $(image_name) .
-```
-2- run container
-```console
-docker run --name $(container_name) -d -p 3000:3000 $(image_name)
+docker-compose -f docker-compose.yml -f docker-compose-prod.yml up --build
 ```
 
 ### Without docker
@@ -19,15 +16,11 @@ docker run --name $(container_name) -d -p 3000:3000 $(image_name)
 ```console
 npm i
 ```
-2- compile tsc
-```console
-npm run tsc
-```
-3- webpack build
+2- build
 ```console
 npm run build
 ```
 4- run server
 ```console
-npm run up
+npm run up-prod
 ```
