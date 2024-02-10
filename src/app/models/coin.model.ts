@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import conn from '../../db/connection';
+import conn from 'db/connection';
 
 export default class Coin extends Model {
     declare value: number;

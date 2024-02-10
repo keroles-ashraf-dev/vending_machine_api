@@ -21,7 +21,9 @@ Product.init({
         references: {
             model: User,
             key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
     },
     name: {
         type: DataTypes.STRING(255),

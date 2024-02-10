@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { jwt_secret_key, jwt_expires_in_minutes } from 'src/config/app.config';
+import { jwt_secret_key, jwt_expires_in_minutes } from 'config/app.config';
 import LoggerService from './logger';
 
 const logger = new LoggerService('jwt');

@@ -1,4 +1,4 @@
-import User from 'src/app/models/user.model';
+import User from 'app/models/user.model';
 
 export interface BaseUserRepo {
     create(data: any): Promise<User>;
@@ -53,11 +53,9 @@ class UserRepo implements BaseUserRepo {
     }
 
     delete = async (query: any): Promise<boolean> => {
-        await User.destroy(query);
+        const deletedNum = await User.destroy(query);
 
-        const users = await this.findAll(query);
-
-        return !users;
+        return deletedNum > 0 ? true : false;
     }
 }
 

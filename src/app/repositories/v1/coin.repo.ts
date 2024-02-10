@@ -1,4 +1,4 @@
-import Coin from 'src/app/models/coin.model';
+import Coin from 'app/models/coin.model';
 
 export interface BaseCoinRepo {
     create(data: any): Promise<Coin>;

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import JWT from '../../services/jwt';
-import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode } from 'src/utils/type';
+import { ApiError, errorHandler } from 'utils/error';
+import { ErrorType, HttpStatusCode } from 'utils/type';
 
 function authenticate(req: Request, res: Response, next: NextFunction) {
     try {
@@ -28,8 +28,7 @@ function authenticate(req: Request, res: Response, next: NextFunction) {
             throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.UNAUTHORIZED, 'Invalid token', true);
         }
 
-        req.body._userId = userId;
-        req.body._userRole = userRole;
+        req['_user'] = { id: userId, role: userRole};
 
         next();
     } catch (err) {

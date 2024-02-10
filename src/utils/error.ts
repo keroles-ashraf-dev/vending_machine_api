@@ -39,12 +39,12 @@ export class ApiError extends BaseError {
 
 export function errorHandler(res: Response, error: Error): Response {
     if (env != envDev) {
+        error.stack = undefined;
+
         // its not development enviroment
         if (error.name == ErrorType.SECURITY_ERROR) {
             // maybe this one should be send to (email, slack, etc)
             error.message = 'Something wrong happend, try again later';
-        } else {
-            error.stack = undefined;
         }
     }
 

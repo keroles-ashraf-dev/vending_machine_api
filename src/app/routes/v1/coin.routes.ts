@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import coinCtrl from 'src/app/controllers/v1/coin.controller'
-import validate from 'src/app/middelwares/validate';
-import { createSchema } from 'src/app/validations/coin.validation';
+import coinCtrl from 'app/controllers/v1/coin.controller'
+import validate from 'app/middelwares/validate';
+import { createSchema } from 'app/validations/coin.validation';
 
 const router = Router();
 

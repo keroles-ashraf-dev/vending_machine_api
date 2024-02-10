@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode, UserRole } from 'src/utils/type';
-import apiRes from 'src/utils/api.response';
-import LoggerService from 'src/services/logger';
-import ProductRepo, { BaseProductRepo } from 'src/app/repositories/v1/product.repo';
-import userRepo, { BaseUserRepo } from 'src/app/repositories/v1/user.repo';
+import { ApiError, errorHandler } from 'utils/error';
+import { ErrorType, HttpStatusCode, UserRole } from 'utils/type';
+import apiRes from 'utils/api.response';
+import LoggerService from 'services/logger';
+import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
+import userRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
 
 class ProductController {
     private static _instance: ProductController;
@@ -27,7 +27,7 @@ class ProductController {
 
     createProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
 
             const name: string = req.body.name;
             const cost: string = req.body.cost;
@@ -77,7 +77,7 @@ class ProductController {
 
     getProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const productId = req.body.product_id;
+            const productId = req.params.product_id;
 
             const product = await this.productRepo.findOne({ where: { id: productId } });
 
@@ -106,7 +106,7 @@ class ProductController {
 
     updateProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
 
             const productId = req.body.product_id;
             const name: string = req.body.name;
@@ -190,7 +190,7 @@ class ProductController {
 
     deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
             const productId = req.body.product_id;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });

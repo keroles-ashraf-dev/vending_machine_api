@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode } from 'src/utils/type';
-import apiRes from 'src/utils/api.response';
-import LoggerService from 'src/services/logger';
-import CoinRepo, { BaseCoinRepo } from 'src/app/repositories/v1/coin.repo';
+import { ApiError, errorHandler } from 'utils/error';
+import { ErrorType, HttpStatusCode } from 'utils/type';
+import apiRes from 'utils/api.response';
+import LoggerService from 'services/logger';
+import CoinRepo, { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
 
 class CoinController {
     private static _instance: CoinController;

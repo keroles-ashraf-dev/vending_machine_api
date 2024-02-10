@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "up-prod": "ENV=prod node dist/index.js",
-    "up-dev": "ENV=dev ts-node-dev -r tsconfig-paths/register src/index.ts",
+    "up-prod": "node dist/index.js",
+    "up-dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
     "build": "tsc -p . && tsc-alias"
   },
   "author": "",

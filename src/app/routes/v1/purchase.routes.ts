@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import purchaseCtrl from 'src/app/controllers/v1/purchase.controller'
-import validate from 'src/app/middelwares/validate';
-import { buySchema } from 'src/app/validations/purchase.validation';
-import authenticate from 'src/app/middelwares/authenticate';
-import authorize from 'src/app/middelwares/authorize';
-import { UserRole } from 'src/utils/type';
+import purchaseCtrl from 'app/controllers/v1/purchase.controller'
+import validate from 'app/middelwares/validate';
+import { buySchema } from 'app/validations/purchase.validation';
+import authenticate from 'app/middelwares/authenticate';
+import authorize from 'app/middelwares/authorize';
+import { UserRole } from 'utils/type';
 
 const router = Router();
 

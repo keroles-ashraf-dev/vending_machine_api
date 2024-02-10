@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode } from 'src/utils/type';
-import apiRes from 'src/utils/api.response';
-import LoggerService from 'src/services/logger';
-import connection from '../../../db/connection';
-import { calcUserDepositAndChange, isDepositionAmountValid } from 'src/helpers/user.deposit';
-import UserRepo, { BaseUserRepo } from 'src/app/repositories/v1/user.repo';
-import ProductRepo, { BaseProductRepo } from 'src/app/repositories/v1/product.repo';
-import CoinRepo, { BaseCoinRepo } from 'src/app/repositories/v1/coin.repo';
+import { ApiError, errorHandler } from 'utils/error';
+import { ErrorType, HttpStatusCode } from 'utils/type';
+import apiRes from 'utils/api.response';
+import LoggerService from 'services/logger';
+import connection from 'db/connection';
+import { calcUserDepositAndChange, isDepositionAmountValid } from 'helpers/user.deposit';
+import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
+import CoinRepo, { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
 
 class DepositionController {
     private static _instance: DepositionController;
@@ -38,7 +38,7 @@ class DepositionController {
 
     deposit = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
             const amount: number = req.body.amount;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
@@ -92,7 +92,7 @@ class DepositionController {
         const trans = await connection.transaction();
 
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
 
@@ -114,7 +114,7 @@ class DepositionController {
                 );
             }
 
-            const coins = await this.coinRepo.findAll({ order: ['amount', 'DESC'] });
+            const coins = await this.coinRepo.findAll({ order: [ ['value', 'DESC'] ] });
 
             // read function doc
             const { userDeposit, returnedCoins } = calcUserDepositAndChange(coins, user.deposit);

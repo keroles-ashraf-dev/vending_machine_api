@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode, UserRole } from 'src/utils/type';
-import apiRes from 'src/utils/api.response';
-import LoggerService from 'src/services/logger';
-import UserRepo, { BaseUserRepo } from 'src/app/repositories/v1/user.repo';
+import { ApiError, errorHandler } from 'utils/error';
+import { ErrorType, HttpStatusCode, UserRole } from 'utils/type';
+import apiRes from 'utils/api.response';
+import LoggerService from 'services/logger';
+import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
 
 class UserController {
     private static _instance: UserController;
@@ -68,7 +68,7 @@ class UserController {
 
     getUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
 
@@ -96,7 +96,7 @@ class UserController {
 
     updateUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
             const username = req.body.username;
             const password = req.body.password;
 
@@ -164,7 +164,7 @@ class UserController {
 
     deleteUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
             const password = req.body.password;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });

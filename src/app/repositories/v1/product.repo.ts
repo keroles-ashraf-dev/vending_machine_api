@@ -1,4 +1,4 @@
-import Product from 'src/app/models/product.model';
+import Product from 'app/models/product.model';
 
 export interface BaseProductRepo {
     create(data: any): Promise<Product>;
@@ -53,11 +53,9 @@ class ProductRepo implements BaseProductRepo {
     }
 
     delete = async (query: any): Promise<boolean> => {
-        await Product.destroy(query);
+        const deletedNum = await Product.destroy(query);
 
-        const products = await this.findAll(query);
-
-        return !products;
+        return deletedNum > 0 ? true : false;
     }
 }
 

@@ -13,7 +13,8 @@ services:
     networks:
       - backend
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
   postgres:
     container_name: postgres_container
     image: postgres:15.5
@@ -31,6 +32,11 @@ services:
       - ${DB_PORT}:5432
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 networks:
   backend:

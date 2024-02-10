@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode } from 'src/utils/type';
-import apiRes from 'src/utils/api.response';
-import LoggerService from 'src/services/logger';
-import connection from '../../../db/connection';
-import { calcUserDepositAndChange } from 'src/helpers/user.deposit';
-import UserRepo, { BaseUserRepo } from 'src/app/repositories/v1/user.repo';
-import ProductRepo, { BaseProductRepo } from 'src/app/repositories/v1/product.repo';
-import CoinRepo, { BaseCoinRepo } from 'src/app/repositories/v1/coin.repo';
+import { ApiError, errorHandler } from 'utils/error';
+import { ErrorType, HttpStatusCode } from 'utils/type';
+import apiRes from 'utils/api.response';
+import LoggerService from 'services/logger';
+import connection from 'db/connection';
+import { calcUserDepositAndChange } from 'helpers/user.deposit';
+import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
+import CoinRepo, { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
 
 class PurchaseController {
     private static _instance: PurchaseController;
@@ -40,7 +40,7 @@ class PurchaseController {
         // First, start a transaction
         const trans = await connection.transaction();
         try {
-            const userId = req.body._id;
+            const userId = req['_user']['id'];
             const productId = req.body.product_id;
             const amount: number = req.body.amount;
 
@@ -87,7 +87,7 @@ class PurchaseController {
 
             const userDepositAfterCharge = user.deposit - totalCost;
 
-            const coins = await this.coinRepo.findAll({ order: ['amount', 'DESC'] });
+            const coins = await this.coinRepo.findAll({ order: [ ['value', 'DESC'] ] });
 
             // read function doc
             const { userDeposit, returnedCoins } = calcUserDepositAndChange(coins, userDepositAfterCharge);

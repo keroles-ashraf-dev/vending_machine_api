@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import depositionCtrl from 'src/app/controllers/v1/deposition.controller'
-import authenticate from 'src/app/middelwares/authenticate';
-import authorize from 'src/app/middelwares/authorize';
-import { UserRole } from 'src/utils/type';
+import depositionCtrl from 'app/controllers/v1/deposition.controller'
+import authenticate from 'app/middelwares/authenticate';
+import authorize from 'app/middelwares/authorize';
+import { UserRole } from 'utils/type';
 
 const router = Router();
 

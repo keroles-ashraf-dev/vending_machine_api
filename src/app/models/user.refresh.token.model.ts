@@ -2,7 +2,7 @@ import { Model, DataTypes } from 'sequelize';
 import { ulid } from 'ulid';
 import conn from '../../db/connection';
 import User from './user.model';
-import { jwt_refresh_expires_in_minutes } from 'src/config/app.config';
+import { jwt_refresh_expires_in_minutes } from 'config/app.config';
 
 export default class UserRefreshToken extends Model {
     declare token: string;
@@ -24,21 +24,23 @@ export default class UserRefreshToken extends Model {
     }
 
     static verifyExpiration = (token: UserRefreshToken) => {
-        return token.expiryDate.getTime() < new Date().getTime();
+        return token.expiryDate.getTime() > new Date().getTime();
     }
 }
 
 UserRefreshToken.init({
     token: {
         type: DataTypes.STRING(64),
-        unique: true,
+        unique: true, // i'm pretty sure the new inserted one gonna be unique because its ULID but
     },
     userId: {
         type: DataTypes.INTEGER,
         references: {
             model: User,
-            key: 'id'
-        }
+            key: 'id',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
     },
     expiryDate: {
         type: DataTypes.DATE,

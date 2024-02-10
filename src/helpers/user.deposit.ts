@@ -1,4 +1,4 @@
-import Coin from "src/app/models/coin.model";
+import Coin from "app/models/coin.model";
 
 /**
     * we need to tell the machine "by sequance" the coins it has to returned
@@ -15,7 +15,7 @@ export function calcUserDepositAndChange(coins: Coin[], userDeposit: number): { 
         const coin = coins[i];
 
         if (userDeposit >= coin.value) {
-            const times = userDeposit / coin.value; // times of coin amount in user deposite ($n)
+            const times = Math.floor(userDeposit / coin.value); // times of coin amount in user deposite ($n)
             const reminder = userDeposit % coin.value; // reminder of modulus user deposite and coin amount
 
             // add coin amount n times to returned coins
