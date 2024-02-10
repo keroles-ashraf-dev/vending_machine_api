@@ -31,12 +31,12 @@ class DepositionController {
         this.coinRepo = coinRepo;
     }
 
-    logger: LoggerService;
-    productRepo: BaseProductRepo;
-    userRepo: BaseUserRepo;
-    coinRepo: BaseCoinRepo;
+    private logger: LoggerService;
+    private productRepo: BaseProductRepo;
+    private userRepo: BaseUserRepo;
+    private coinRepo: BaseCoinRepo;
 
-    async deposit(req: Request, res: Response, next: NextFunction) {
+    deposit = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.body._id;
             const amount: number = req.body.amount;
@@ -87,7 +87,7 @@ class DepositionController {
         }
     }
 
-    async reset(req: Request, res: Response, next: NextFunction) {
+    reset = async (req: Request, res: Response, next: NextFunction) => {
         // First, start a transaction
         const trans = await connection.transaction();
 

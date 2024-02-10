@@ -17,19 +17,19 @@ class UserRefreshTokenRepo implements BaseUserRefreshTokenRepo {
         return this._instance || (this._instance = new this());
     }
 
-    async create(user: User): Promise<string> {
+    create = async (user: User): Promise<string> => {
         const token = await UserRefreshToken.createToken(user);
 
         return token;
     }
 
-    async findOne(query: any): Promise<UserRefreshToken> {
+    findOne = async (query: any): Promise<UserRefreshToken> => {
         const userrefreshtoken = await UserRefreshToken.findOne(query);
 
         return userrefreshtoken;
     }
 
-    verifyExpiration(token: UserRefreshToken): boolean {
+    verifyExpiration = (token: UserRefreshToken): boolean => {
         const valid = UserRefreshToken.verifyExpiration(token);
 
         return valid;

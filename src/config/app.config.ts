@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-dotenv.config({ path: `.env.${process.env.ENV}` }); // read .env file for specific enviroment
+dotenv.config({ path: '.env' });
 
 export const env = process.env.ENV;
 export const port = Number(process.env.API_PORT);

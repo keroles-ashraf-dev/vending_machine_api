@@ -16,19 +16,19 @@ class CoinRepo implements BaseCoinRepo {
         return this._instance || (this._instance = new this());
     }
 
-    async create(data: any): Promise<Coin> {
+    create = async (data: any): Promise<Coin> => {
         const coin = await Coin.create(data);
 
         return coin;
     }
 
-    async createBulk(data: Array<any>): Promise<Coin[]> {
+    createBulk = async (data: Array<any>): Promise<Coin[]> => {
         const coins = await Coin.bulkCreate(data);
 
         return coins;
     }
 
-    async findAll(query: any): Promise<Coin[]> {
+    findAll = async (query: any): Promise<Coin[]> => {
         const coins = await Coin.findAll(query);
 
         return coins;

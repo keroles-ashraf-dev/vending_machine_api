@@ -18,10 +18,10 @@ class UserController {
         this.userRepo = userRepo;
     }
 
-    logger: LoggerService;
-    userRepo: BaseUserRepo;
+    private logger: LoggerService;
+    private userRepo: BaseUserRepo;
 
-    async createUser(req: Request, res: Response, next: NextFunction) {
+    createUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const username: string = req.body.username;
             const password: string = req.body.password;
@@ -66,7 +66,7 @@ class UserController {
         }
     }
 
-    async getUser(req: Request, res: Response, next: NextFunction) {
+    getUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.body._id;
 
@@ -94,7 +94,7 @@ class UserController {
         }
     }
 
-    async updateUser(req: Request, res: Response, next: NextFunction) {
+    updateUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.body._id;
             const username = req.body.username;
@@ -162,7 +162,7 @@ class UserController {
         }
     }
 
-    async deleteUser(req: Request, res: Response, next: NextFunction) {
+    deleteUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.body._id;
             const password = req.body.password;

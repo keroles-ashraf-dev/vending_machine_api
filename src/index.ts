@@ -7,9 +7,9 @@ const logger = new LoggerService('index');
 
 function start(): void {
     try {
-        app.listen(port, async () => {
+        app.listen(port, async () => { 
             await connection.sync();
-
+            
             logger.info('Server started on port ' + port);
         });
     } catch (err) { 

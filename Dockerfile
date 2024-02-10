@@ -7,8 +7,7 @@ COPY package*.json ./
 FROM base as dev
 RUN npm install
 COPY . .
-ENV PORT=3000
-EXPOSE $PORT
+EXPOSE $API_PORT
 CMD [ "npm", "run", "up-dev" ]
 
 # production build
@@ -21,6 +20,5 @@ RUN npm run build
 FROM base as prod
 RUN npm install --only=production
 COPY --from=prod_build app/dist/ ./dist
-ENV PORT=3000
-EXPOSE $PORT
+EXPOSE $API_PORT
 CMD [ "npm", "run", "up-prod" ]

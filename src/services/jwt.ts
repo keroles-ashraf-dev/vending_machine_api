@@ -5,9 +5,9 @@ import LoggerService from './logger';
 const logger = new LoggerService('jwt');
 
 class JWT {
-    static verify(token: string): string | jwt.JwtPayload | null {
+    static verify = (token: string): string | jwt.JwtPayload | null => {
         try {
-            const decoded = jwt.verify(token, jwt_secret_key);
+            const decoded = jwt.verify(token, jwt_secret_key!);
 
             return decoded;
         } catch (err) {
@@ -16,9 +16,9 @@ class JWT {
         }
     }
 
-    static sign(payload: string | object | Buffer): string | null {
+    static sign = (payload: string | object | Buffer): string | null => {
         try {
-            const token = jwt.sign(payload, jwt_secret_key, { expiresIn: jwt_expires_in_minutes * 60 });
+            const token = jwt.sign(payload, jwt_secret_key!, { expiresIn: jwt_expires_in_minutes * 60 });
 
             return token;
         } catch (err) {

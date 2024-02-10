@@ -9,7 +9,7 @@ export default class UserRefreshToken extends Model {
     declare userId: number;
     declare expiryDate: Date;
 
-    static async createToken(user: User) {
+    static createToken = async (user: User) => {
         const expiredAt = new Date();
 
         expiredAt.setMinutes(expiredAt.getMinutes() + jwt_refresh_expires_in_minutes);
@@ -23,7 +23,7 @@ export default class UserRefreshToken extends Model {
         return refreshToken.token;
     }
 
-    static verifyExpiration(token: UserRefreshToken) {
+    static verifyExpiration = (token: UserRefreshToken) => {
         return token.expiryDate.getTime() < new Date().getTime();
     }
 }

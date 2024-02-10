@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-dotenv.config({ path: `.env.${process.env.ENV}` }); // read .env file for specific enviroment
+dotenv.config({ path: '.env' });
 
 export const db_host = String(process.env.DB_HOST);
 export const db_port = Number(process.env.DB_PORT);

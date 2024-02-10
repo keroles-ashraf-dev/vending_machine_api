@@ -31,12 +31,12 @@ class PurchaseController {
         this.coinRepo = coinRepo;
     }
 
-    logger: LoggerService;
-    productRepo: BaseProductRepo;
-    userRepo: BaseUserRepo;
-    coinRepo: BaseCoinRepo;
+    private logger: LoggerService;
+    private productRepo: BaseProductRepo;
+    private userRepo: BaseUserRepo;
+    private coinRepo: BaseCoinRepo;
 
-    async buy(req: Request, res: Response, next: NextFunction) {
+    buy = async (req: Request, res: Response, next: NextFunction) => {
         // First, start a transaction
         const trans = await connection.transaction();
         try {

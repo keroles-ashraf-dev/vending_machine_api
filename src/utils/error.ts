@@ -44,13 +44,13 @@ export function errorHandler(res: Response, error: Error): Response {
             // maybe this one should be send to (email, slack, etc)
             error.message = 'Something wrong happend, try again later';
         } else {
-            error.stack = null;
+            error.stack = undefined;
         }
     }
 
     if (error instanceof ApiError) {
-        return apiRes(res, error.code, error.name, error.message, { error_stack: error.stack });
+        return apiRes(res, error.code, 'Failed', error.message, { error_stack: error.stack });
     } else {
-        return apiRes(res, HttpStatusCode.INTERNAL_SERVER_ERROR, error.name, error.message, { error_stack: error.stack });
+        return apiRes(res, HttpStatusCode.INTERNAL_SERVER_ERROR, 'Failed', error.message, { error_stack: error.stack });
     }
 }

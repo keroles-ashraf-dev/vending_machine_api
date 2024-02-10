@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiError, errorHandler } from 'src/utils/error';
-import { ErrorType, HttpStatusCode, UserRole } from 'src/utils/type';
+import { ErrorType, HttpStatusCode } from 'src/utils/type';
 import apiRes from 'src/utils/api.response';
 import LoggerService from 'src/services/logger';
 import CoinRepo, { BaseCoinRepo } from 'src/app/repositories/v1/coin.repo';
@@ -17,10 +17,10 @@ class CoinController {
         this.coinRepo = coinRepo;
     }
 
-    logger: LoggerService;
-    coinRepo: BaseCoinRepo;
+    private logger: LoggerService;
+    private coinRepo: BaseCoinRepo;
 
-    async create(req: Request, res: Response, next: NextFunction) {
+    create = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const coin: number = req.body.coin;
             const coins: number[] = req.body.coins;
@@ -43,7 +43,7 @@ class CoinController {
                 coinsData.push(coin);
             }
 
-            const duplication = await this.coinRepo.findAll({ where: { value: { $in: coinsData } } });
+            const duplication = await this.coinRepo.findAll({ where: { value: coinsData  } });
 
             if (duplication && duplication.length > 0) {
                 throw new ApiError(
@@ -53,10 +53,10 @@ class CoinController {
                     true
                 );
             }
-            
-            const insertedData = [];
 
-            for(let i = 0; i < coinsData.length; i++){
+            const insertedData: any = [];
+
+            for (let i = 0; i < coinsData.length; i++) {
                 insertedData.push({ value: coinsData[i] });
             }
 

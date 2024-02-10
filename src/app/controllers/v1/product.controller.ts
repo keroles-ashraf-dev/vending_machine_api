@@ -11,7 +11,8 @@ class ProductController {
     public static get Instance() {
         return this._instance || (this._instance = new this(
             new LoggerService('product.controller'),
-            ProductRepo, userRepo,
+            ProductRepo,
+            userRepo,
         ));
     }
     private constructor(logger: LoggerService, productRepo: BaseProductRepo, userRepo: BaseUserRepo) {
@@ -20,11 +21,11 @@ class ProductController {
         this.userRepo = userRepo;
     }
 
-    logger: LoggerService;
-    productRepo: BaseProductRepo;
-    userRepo: BaseUserRepo;
+    private logger: LoggerService;
+    private productRepo: BaseProductRepo;
+    private userRepo: BaseUserRepo;
 
-    async createProduct(req: Request, res: Response, next: NextFunction) {
+    createProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.body._id;
 
@@ -74,7 +75,7 @@ class ProductController {
         }
     }
 
-    async getProduct(req: Request, res: Response, next: NextFunction) {
+    getProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const productId = req.body.product_id;
 
@@ -103,7 +104,7 @@ class ProductController {
         }
     }
 
-    async updateProduct(req: Request, res: Response, next: NextFunction) {
+    updateProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.body._id;
 
@@ -187,7 +188,7 @@ class ProductController {
         }
     }
 
-    async deleteProduct(req: Request, res: Response, next: NextFunction) {
+    deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.body._id;
             const productId = req.body.product_id;

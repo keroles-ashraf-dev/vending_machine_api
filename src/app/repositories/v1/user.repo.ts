@@ -20,29 +20,29 @@ class UserRepo implements BaseUserRepo {
         return this._instance || (this._instance = new this());
     }
 
-    async create(data: any): Promise<User> {
+    create = async (data: any): Promise<User> => {
         const user = await User.create(data);
 
         return user;
     }
 
-    async findOne(query: any): Promise<User> {
+    findOne = async (query: any): Promise<User> => {
         const user = await User.findOne(query);
 
         return user;
     }
 
-    async findAll(query: any): Promise<User[]> {
+    findAll = async (query: any): Promise<User[]> => {
         const users = await User.findAll(query);
 
         return users;
     }
 
-    async update(userOrId: User | number, data: any): Promise<User> {
+    update = async (userOrId: User | number, data: any): Promise<User> => {
         let user: User;
 
         if (userOrId instanceof Number) {
-            user = await this.findOne({ where: { id: user } });
+            user = await this.findOne({ where: { id: userOrId } });
         } else {
             user = userOrId as User;
         }
@@ -52,7 +52,7 @@ class UserRepo implements BaseUserRepo {
         return modifiedUser;
     }
 
-    async delete(query: any): Promise<boolean> {
+    delete = async (query: any): Promise<boolean> => {
         await User.destroy(query);
 
         const users = await this.findAll(query);

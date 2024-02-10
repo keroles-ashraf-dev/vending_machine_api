@@ -3,21 +3,17 @@ import { Response } from "express";
 function apiRes(
     res: Response,
     code: number,
-    msg: string,
+    msg: string | null,
     error: string | null = null,
     data: object | null = null,
 ) {
-    this.res = res;
-    this.code = code;
-    this.msg = msg;
-    this.error = error;
-    this.data = data;
+    const resData = {};
 
-    return res.status(code).send({
-        message: msg,
-        error: error,
-        data: data,
-    });
+    if (msg) resData['message'] = msg;
+    if (error) resData['error'] = error;
+    if (data) resData['data'] = data;
+
+    return res.status(code).send(resData);
 }
 
 export default apiRes;

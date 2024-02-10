@@ -5,34 +5,25 @@ services:
       context: .
       target: dev
     env_file:
-      - .env.dev
+      - .env
     ports:
-      - "3000:3000"
+      - ${API_PORT}:${API_PORT}
     volumes:
       - ./src:/app/src:ro
     networks:
       - backend
     depends_on:
       - postgres
-  nginx:
-    container_name: nginx_container
-    image: nginx:stable-alpine
-    volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - "80:80"
-      - "443:443"
-    networks:
-      - backend
-    depends_on:
-      - app
   postgres:
     container_name: postgres_container
     image: postgres:15.5
+    restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: "${DB_NAME}"
-      POSTGRES_USER: "${DB_USER}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       PGDATA: /data/postgres
     volumes:
       - app_postgres_vol:/var/lib/postgresql/data
@@ -40,7 +31,6 @@ services:
       - ${DB_PORT}:5432
     networks:
       - backend
-    restart: unless-stopped
 
 networks:
   backend:

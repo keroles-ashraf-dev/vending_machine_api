@@ -27,11 +27,11 @@ class AuthController {
         this.userRefreshTokenRepo = userRefreshTokenRepo;
     }
 
-    logger: LoggerService;
-    userRepo: BaseUserRepo;
-    userRefreshTokenRepo: BaseUserRefreshTokenRepo;
+    private logger: LoggerService;
+    private userRepo: BaseUserRepo;
+    private userRefreshTokenRepo: BaseUserRefreshTokenRepo;
 
-    async login(req: Request, res: Response, next: NextFunction) {
+    login = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const username = req.body.username;
             const password = req.body.password;
@@ -63,7 +63,7 @@ class AuthController {
         }
     }
 
-    async refreshToken(req: Request, res: Response, next: NextFunction) {
+    refreshToken = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const refreshToken = req.body.refresh_token;
 

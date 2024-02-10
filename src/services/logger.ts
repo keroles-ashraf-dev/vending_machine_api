@@ -1,8 +1,8 @@
 import winston from "winston";
-import { log_file_path, env } from '../config/app.config';
-import { envDev } from '../utils/constant';
+import { log_file_path, env } from 'config/app.config';
+import { envDev } from 'utils/constant';
 
-// logging format => date + logger level + message + {obj}
+// logging format => date + logger level + message + {data}
 
 const dateTimeFormat = () => {
     return new Date(Date.now()).toLocaleString;
@@ -13,14 +13,14 @@ const dateFormat = () => {
 }
 
 class LoggerService {
-    logger: winston.Logger;
+    private logger: winston.Logger;
 
     constructor(route: string = 'general') {
         this.logger = winston.createLogger({
             level: 'info',
             format: winston.format.printf(info => {
                 let msg = dateTimeFormat + ' | ' + info.level.toUpperCase + ' | ' + info.message;
-                msg = info.obj ? msg + ' | ' + JSON.stringify(info.obj) : msg;
+                msg = info.data ? msg + ' | ' + JSON.stringify(info.data) : msg;
                 return msg;
             }),
             transports: [
@@ -28,47 +28,27 @@ class LoggerService {
             ],
         });
 
-        if (env !== envDev) {
+        if (env == envDev) {
             this.logger.add(new winston.transports.Console({
                 format: winston.format.simple(),
             }));
         }
     }
 
-    async info(msg: string, obj: object = null) {
-        if (obj == null) {
-            this.logger.log('info', msg);
-        }
-        else {
-            this.logger.log('info', msg, obj);
-        }
+    info = async (msg: string, data: any = null) => {
+        this.logger.log('info', msg, data);
     }
 
-    async debug(msg: string, obj: object = null) {
-        if (obj == null) {
-            this.logger.log('debug', msg);
-        }
-        else {
-            this.logger.log('debug', msg, obj);
-        }
+    debug = async (msg: string, data: any = null) => {
+        this.logger.log('debug', msg, data);
     }
 
-    async warning(msg: string, obj: object = null) {
-        if (obj == null) {
-            this.logger.log('warning', msg);
-        }
-        else {
-            this.logger.log('warning', msg, obj);
-        }
+    warning = async (msg: string, data: any = null) => {
+        this.logger.log('warning', msg, data);
     }
 
-    async error(msg: string, obj: object = null) {
-        if (obj == null) {
-            this.logger.log('error', msg);
-        }
-        else {
-            this.logger.log('error', msg, obj);
-        }
+    error = async (msg: string, data: any = null) => {
+        this.logger.log('error', msg, data);
     }
 }
 

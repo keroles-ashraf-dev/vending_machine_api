@@ -15,7 +15,7 @@ const app = express();
 app.use(bodyParser.json()); // parse requests of content-type - application/json
 app.use(bodyParser.urlencoded({ extended: true })); // parse requests of content-type - application/x-www-form-urlencoded
 app.use(helmet()); // set secure HTTP response headers
-app.use(
+app.use( 
     cors({
         origin: client_origin_url, // pecify the allowed origins
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

@@ -20,29 +20,29 @@ class ProductRepo implements BaseProductRepo {
         return this._instance || (this._instance = new this());
     }
 
-    async create(data: any): Promise<Product> {
+    create = async (data: any): Promise<Product> => {
         const product = await Product.create(data);
 
         return product;
     }
 
-    async findOne(query: any): Promise<Product> {
+    findOne = async (query: any): Promise<Product> => {
         const product = await Product.findOne(query);
 
         return product;
     }
 
-    async findAll(query: any): Promise<Product[]> {
+    findAll = async (query: any): Promise<Product[]> => {
         const products = await Product.findAll(query);
 
         return products;
     }
 
-    async update(productOrId: Product | number, data: any): Promise<Product> {
+    update = async (productOrId: Product | number, data: any): Promise<Product> => {
         let product: Product;
 
         if (productOrId instanceof Number) {
-            product = await this.findOne({ where: { id: product } });
+            product = await this.findOne({ where: { id: productOrId } });
         } else {
             product = productOrId as Product;
         }
@@ -52,7 +52,7 @@ class ProductRepo implements BaseProductRepo {
         return modifiedProduct;
     }
 
-    async delete(query: any): Promise<boolean> {
+    delete = async (query: any): Promise<boolean> => {
         await Product.destroy(query);
 
         const products = await this.findAll(query);
