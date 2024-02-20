@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'utils/error';
+import { ApiError } from 'utils/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 import apiRes from 'utils/api.response';
 import LoggerService from 'services/logger';
@@ -114,7 +114,7 @@ class PurchaseController {
                 );
             }
 
-            const data = {
+            const resData = {
                 username: modifiedUser.username,
                 deposit_amount: modifiedUser.deposit,
                 change: returnedCoins,
@@ -124,16 +124,18 @@ class PurchaseController {
                 product_amount_purchased: amount,
             }
 
+            this.logger.error('purchasing succeeded', resData);
+
             // commit the transaction.
             await trans.commit();
 
-            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully purchased', null, data);
+            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully purchased', null, resData);
         } catch (err) {
             // rollback the transaction.
             await trans.rollback();
 
-            this.logger.error('purchasing error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
+            next(err); // Pass error to error-handler middleware
         }
     }
 }

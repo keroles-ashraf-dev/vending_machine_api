@@ -9,6 +9,7 @@ import productRoutes from 'app/routes/v1/product.routes';
 import purchaseRoutes from 'app/routes/v1/purchase.routes';
 import userRoutes from 'app/routes/v1/user.routes';
 import { client_origin_url } from 'config/app.config';
+import errorCatch from './middelwares/error_catch';
 
 const app = express();
 
@@ -23,11 +24,14 @@ app.use(
     })
 );
 
+
 app.use('/api/v1', authRoutes);
 app.use('/api/v1', coinRoutes);
 app.use('/api/v1', depositionRoutes);
 app.use('/api/v1', productRoutes);
 app.use('/api/v1', purchaseRoutes);
 app.use('/api/v1', userRoutes);
+
+app.use(errorCatch); // Error handler middleware
 
 export default app;

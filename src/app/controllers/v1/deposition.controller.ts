@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'utils/error';
+import { ApiError } from 'utils/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 import apiRes from 'utils/api.response';
 import LoggerService from 'services/logger';
@@ -75,6 +75,8 @@ class DepositionController {
                 );
             }
 
+            this.logger.error('Deposition succeeded', { username: modifiedUser.username, amount: modifiedUser.deposit });
+
             const resData = {
                 username: modifiedUser.username,
                 deposit_amount: modifiedUser.deposit,
@@ -82,8 +84,7 @@ class DepositionController {
 
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully deposition', null, resData);
         } catch (err) {
-            this.logger.error('Deposition error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -114,7 +115,7 @@ class DepositionController {
                 );
             }
 
-            const coins = await this.coinRepo.findAll({ order: [ ['value', 'DESC'] ] });
+            const coins = await this.coinRepo.findAll({ order: [['value', 'DESC']] });
 
             // read function doc
             const { userDeposit, returnedCoins } = calcUserDepositAndChange(coins, user.deposit);
@@ -128,6 +129,12 @@ class DepositionController {
                     'Deposition resetting not succeeded. something wrong happend, try again later', true
                 );
             }
+
+            this.logger.error('Deposition resetting succeeded', {
+                username: modifiedUser.username,
+                deposit: modifiedUser.deposit,
+                returned_coins: returnedCoins,
+            });
 
             const resData = {
                 username: modifiedUser.username,
@@ -143,8 +150,7 @@ class DepositionController {
             // rollback the transaction.
             await trans.rollback();
 
-            this.logger.error('Deposition resetting error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 }

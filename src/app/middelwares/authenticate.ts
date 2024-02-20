@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import JWT from '../../services/jwt';
-import { ApiError, errorHandler } from 'utils/error';
+import JWT from 'services/jwt';
+import { ApiError } from 'utils/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 
 function authenticate(req: Request, res: Response, next: NextFunction) {
-    try {
         const authHeader = req.headers['authorization'];
         if (!authHeader) {
             throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.UNAUTHORIZED, 'Token required', true);
@@ -31,9 +30,6 @@ function authenticate(req: Request, res: Response, next: NextFunction) {
         req['_user'] = { id: userId, role: userRole};
 
         next();
-    } catch (err) {
-        return errorHandler(res, err);
-    }
 }
 
 export default authenticate;

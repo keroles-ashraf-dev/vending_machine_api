@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'utils/error';
+import { ApiError } from 'utils/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 import apiRes from 'utils/api.response';
 import LoggerService from 'services/logger';
@@ -70,14 +70,17 @@ class CoinController {
                 );
             }
 
+            const coinsArray = insertedCoins.map(e => e.value);
+
+            this.logger.error('Coins created', coinsArray);
+
             const resData = {
-                coins: insertedCoins.map(e => e.value),
+                coins: coinsArray,
             }
 
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully coins added', null, resData);
         } catch (err) {
-            this.logger.error('Coins adding error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 }

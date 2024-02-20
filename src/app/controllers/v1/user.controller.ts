@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { ApiError, errorHandler } from 'utils/error';
+import { ApiError } from 'utils/error';
 import { ErrorType, HttpStatusCode, UserRole } from 'utils/type';
 import apiRes from 'utils/api.response';
 import LoggerService from 'services/logger';
@@ -59,10 +59,11 @@ class UserController {
                 role: user.role,
             }
 
+            this.logger.error('User creating succeeded', resData);
+
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user created', null, resData);
         } catch (err) {
-            this.logger.error('User creating error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -89,8 +90,7 @@ class UserController {
 
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user fetched', null, resData);
         } catch (err) {
-            this.logger.error('User fetching error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -157,8 +157,7 @@ class UserController {
 
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user updated', null, resData);
         } catch (err) {
-            this.logger.error('User updating error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -197,10 +196,11 @@ class UserController {
                 username: user.username,
             }
 
+            this.logger.error('User deleting succeeded', resData);
+
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user deleted', null, resData);
         } catch (err) {
-            this.logger.error('User deleting error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 }

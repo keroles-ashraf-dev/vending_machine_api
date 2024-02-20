@@ -24,7 +24,7 @@ class LoggerService {
                 return msg;
             }),
             transports: [
-                new winston.transports.File({ filename: log_file_path + '/' + dateFormat + '/' + route + '.log' }),
+                new winston.transports.File({ filename: log_file_path + '/' + dateFormat() + '/' + route + '.log' }),
             ],
         });
 

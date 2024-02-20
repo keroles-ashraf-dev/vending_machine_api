@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { ApiError, errorHandler } from 'utils/error';
+import { ApiError } from 'utils/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 import JWT from 'services/jwt';
 import apiRes from 'utils/api.response';
@@ -49,6 +49,8 @@ class AuthController {
             const accessToken = JWT.sign({ _id: user.id, _role: user.role });
             const refreshToken = await this.userRefreshTokenRepo.create(user);
 
+            this.logger.error('Login succeeded', user.username);
+
             const resData = {
                 id: user.id,
                 username: user.username,
@@ -58,8 +60,7 @@ class AuthController {
 
             return apiRes(res, HttpStatusCode.OK, 'Sucessfully logged in', null, resData);
         } catch (err) {
-            this.logger.error('Login error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -88,6 +89,8 @@ class AuthController {
 
             const accessToken = JWT.sign({ _id: user.id, _role: user.role });
 
+            this.logger.error('Refresh token succeeded', user.username);
+
             const resData = {
                 access_token: accessToken,
                 refresh_token: refreshToken,
@@ -95,8 +98,7 @@ class AuthController {
 
             return apiRes(res, HttpStatusCode.OK, 'Sucessfully new token generated', null, resData);
         } catch (err) {
-            this.logger.error('Refresh token error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 }

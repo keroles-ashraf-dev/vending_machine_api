@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError, errorHandler } from 'utils/error';
+import { ApiError } from 'utils/error';
 import { ErrorType, HttpStatusCode, UserRole } from 'utils/type';
 import apiRes from 'utils/api.response';
 import LoggerService from 'services/logger';
@@ -68,10 +68,11 @@ class ProductController {
                 amount_available: product.amountAvailable,
             }
 
+            this.logger.error('Product creating succeeded', resData);
+
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully product created', null, resData);
         } catch (err) {
-            this.logger.error('Product creating error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -99,8 +100,7 @@ class ProductController {
 
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully product fetched', null, resData);
         } catch (err) {
-            this.logger.error('Product fetching error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -181,10 +181,11 @@ class ProductController {
                 amount_available: modifiedProduct.amountAvailable,
             }
 
+            this.logger.error('Product updating succeeded', resData);
+
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully product updated', null, resData);
         } catch (err) {
-            this.logger.error('Product updating error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 
@@ -241,10 +242,11 @@ class ProductController {
                 amount_available: product.amountAvailable,
             }
 
+            this.logger.error('Product deleting succeeded', resData);
+
             return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully product deleted', null, resData);
         } catch (err) {
-            this.logger.error('Product deleting error', err);
-            return errorHandler(res, err);
+            next(err); // Pass error to error-handler middleware
         }
     }
 }
