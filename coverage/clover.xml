@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1712926462978" clover="3.2.0">
-  <project timestamp="1712926462979" name="All files">
-    <metrics statements="443" coveredstatements="305" conditionals="9" coveredconditionals="8" methods="16" coveredmethods="4" elements="468" coveredelements="317" complexity="0" loc="443" ncloc="443" packages="6" files="11" classes="11"/>
+<coverage generated="1712945009479" clover="3.2.0">
+  <project timestamp="1712945009480" name="All files">
+    <metrics statements="406" coveredstatements="295" conditionals="15" coveredconditionals="15" methods="15" coveredmethods="4" elements="436" coveredelements="314" complexity="0" loc="406" ncloc="406" packages="6" files="10" classes="10"/>
     <package name="app.models">
       <metrics statements="49" coveredstatements="46" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="user.model.ts" path="/home/keroles/codes/vending_machine_api/src/app/models/user.model.ts">
@@ -58,9 +58,9 @@
       </file>
     </package>
     <package name="app.services.v1">
-      <metrics statements="136" coveredstatements="43" conditionals="4" coveredconditionals="3" methods="10" coveredmethods="2"/>
+      <metrics statements="136" coveredstatements="70" conditionals="10" coveredconditionals="10" methods="10" coveredmethods="2"/>
       <file name="auth.service.ts" path="/home/keroles/codes/vending_machine_api/src/app/services/v1/auth.service.ts">
-        <metrics statements="136" coveredstatements="43" conditionals="4" coveredconditionals="3" methods="10" coveredmethods="2"/>
+        <metrics statements="136" coveredstatements="70" conditionals="10" coveredconditionals="10" methods="10" coveredmethods="2"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -76,44 +76,44 @@
         <line num="13" count="1" type="stmt"/>
         <line num="14" count="1" type="stmt"/>
         <line num="15" count="1" type="cond" truecount="1" falsecount="0"/>
-        <line num="16" count="2" type="stmt"/>
-        <line num="17" count="2" type="stmt"/>
-        <line num="18" count="2" type="stmt"/>
-        <line num="19" count="2" type="stmt"/>
+        <line num="16" count="5" type="stmt"/>
+        <line num="17" count="5" type="stmt"/>
+        <line num="18" count="5" type="stmt"/>
+        <line num="19" count="5" type="stmt"/>
         <line num="20" count="1" type="stmt"/>
         <line num="21" count="1" type="cond" truecount="2" falsecount="0"/>
-        <line num="22" count="6" type="stmt"/>
-        <line num="23" count="6" type="stmt"/>
-        <line num="24" count="6" type="stmt"/>
-        <line num="25" count="6" type="stmt"/>
-        <line num="26" count="6" type="stmt"/>
-        <line num="27" count="0" type="cond" truecount="0" falsecount="1"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="33" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
-        <line num="44" count="0" type="stmt"/>
-        <line num="45" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="48" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
+        <line num="22" count="5" type="stmt"/>
+        <line num="23" count="5" type="stmt"/>
+        <line num="24" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="27" count="4" type="cond" truecount="1" falsecount="0"/>
+        <line num="28" count="4" type="stmt"/>
+        <line num="29" count="4" type="stmt"/>
+        <line num="30" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="33" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="34" count="3" type="stmt"/>
+        <line num="35" count="3" type="stmt"/>
+        <line num="36" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="39" count="2" type="cond" truecount="1" falsecount="0"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="41" count="2" type="stmt"/>
+        <line num="42" count="5" type="cond" truecount="1" falsecount="0"/>
+        <line num="43" count="1" type="stmt"/>
+        <line num="44" count="1" type="stmt"/>
+        <line num="45" count="1" type="stmt"/>
+        <line num="46" count="1" type="stmt"/>
+        <line num="47" count="1" type="stmt"/>
+        <line num="48" count="1" type="stmt"/>
+        <line num="49" count="1" type="stmt"/>
+        <line num="50" count="1" type="stmt"/>
+        <line num="51" count="1" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="53" count="1" type="stmt"/>
         <line num="54" count="1" type="stmt"/>
         <line num="55" count="1" type="stmt"/>
         <line num="56" count="0" type="stmt"/>
@@ -254,7 +254,7 @@
       </file>
     </package>
     <package name="helpers">
-      <metrics statements="195" coveredstatements="153" conditionals="2" coveredconditionals="2" methods="6" coveredmethods="2"/>
+      <metrics statements="158" coveredstatements="116" conditionals="2" coveredconditionals="2" methods="5" coveredmethods="2"/>
       <file name="api.response.ts" path="/home/keroles/codes/vending_machine_api/src/helpers/api.response.ts">
         <metrics statements="22" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
@@ -297,30 +297,30 @@
         <line num="13" count="1" type="stmt"/>
         <line num="14" count="1" type="stmt"/>
         <line num="15" count="1" type="cond" truecount="1" falsecount="0"/>
-        <line num="16" count="11" type="stmt"/>
-        <line num="17" count="11" type="stmt"/>
-        <line num="18" count="11" type="stmt"/>
-        <line num="19" count="11" type="stmt"/>
-        <line num="20" count="11" type="stmt"/>
-        <line num="21" count="11" type="stmt"/>
-        <line num="22" count="11" type="stmt"/>
-        <line num="23" count="11" type="stmt"/>
-        <line num="24" count="11" type="stmt"/>
-        <line num="25" count="11" type="stmt"/>
-        <line num="26" count="11" type="stmt"/>
-        <line num="27" count="11" type="stmt"/>
-        <line num="28" count="11" type="stmt"/>
+        <line num="16" count="8" type="stmt"/>
+        <line num="17" count="8" type="stmt"/>
+        <line num="18" count="8" type="stmt"/>
+        <line num="19" count="8" type="stmt"/>
+        <line num="20" count="8" type="stmt"/>
+        <line num="21" count="8" type="stmt"/>
+        <line num="22" count="8" type="stmt"/>
+        <line num="23" count="8" type="stmt"/>
+        <line num="24" count="8" type="stmt"/>
+        <line num="25" count="8" type="stmt"/>
+        <line num="26" count="8" type="stmt"/>
+        <line num="27" count="8" type="stmt"/>
+        <line num="28" count="8" type="stmt"/>
         <line num="29" count="1" type="stmt"/>
         <line num="30" count="1" type="stmt"/>
         <line num="31" count="1" type="stmt"/>
         <line num="32" count="1" type="cond" truecount="1" falsecount="0"/>
-        <line num="33" count="11" type="stmt"/>
-        <line num="34" count="11" type="stmt"/>
-        <line num="35" count="11" type="stmt"/>
-        <line num="36" count="11" type="stmt"/>
-        <line num="37" count="11" type="stmt"/>
-        <line num="38" count="11" type="stmt"/>
-        <line num="39" count="11" type="stmt"/>
+        <line num="33" count="8" type="stmt"/>
+        <line num="34" count="8" type="stmt"/>
+        <line num="35" count="8" type="stmt"/>
+        <line num="36" count="8" type="stmt"/>
+        <line num="37" count="8" type="stmt"/>
+        <line num="38" count="8" type="stmt"/>
+        <line num="39" count="8" type="stmt"/>
         <line num="40" count="1" type="stmt"/>
         <line num="41" count="1" type="stmt"/>
         <line num="42" count="1" type="stmt"/>
@@ -364,46 +364,6 @@
         <line num="80" count="1" type="stmt"/>
         <line num="81" count="1" type="stmt"/>
         <line num="82" count="1" type="stmt"/>
-      </file>
-      <file name="jwt.ts" path="/home/keroles/codes/vending_machine_api/src/helpers/jwt.ts">
-        <metrics statements="37" coveredstatements="37" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="2" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="5" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="7" count="1" type="stmt"/>
-        <line num="8" count="1" type="stmt"/>
-        <line num="9" count="1" type="stmt"/>
-        <line num="10" count="1" type="stmt"/>
-        <line num="11" count="1" type="stmt"/>
-        <line num="12" count="1" type="stmt"/>
-        <line num="13" count="1" type="stmt"/>
-        <line num="14" count="1" type="stmt"/>
-        <line num="15" count="1" type="stmt"/>
-        <line num="16" count="1" type="stmt"/>
-        <line num="17" count="1" type="stmt"/>
-        <line num="18" count="1" type="stmt"/>
-        <line num="19" count="1" type="stmt"/>
-        <line num="20" count="1" type="stmt"/>
-        <line num="21" count="1" type="stmt"/>
-        <line num="22" count="1" type="stmt"/>
-        <line num="23" count="1" type="stmt"/>
-        <line num="24" count="1" type="stmt"/>
-        <line num="25" count="1" type="stmt"/>
-        <line num="26" count="1" type="stmt"/>
-        <line num="27" count="1" type="stmt"/>
-        <line num="28" count="1" type="stmt"/>
-        <line num="29" count="1" type="stmt"/>
-        <line num="30" count="1" type="stmt"/>
-        <line num="31" count="1" type="stmt"/>
-        <line num="32" count="1" type="stmt"/>
-        <line num="33" count="1" type="stmt"/>
-        <line num="34" count="1" type="stmt"/>
-        <line num="35" count="1" type="stmt"/>
-        <line num="36" count="1" type="stmt"/>
-        <line num="37" count="1" type="stmt"/>
       </file>
       <file name="logger.ts" path="/home/keroles/codes/vending_machine_api/src/helpers/logger.ts">
         <metrics statements="54" coveredstatements="36" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
