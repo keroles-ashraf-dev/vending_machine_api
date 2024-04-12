@@ -1,9 +1,11 @@
+import "reflect-metadata";
+import { singleton } from 'tsyringe';
 import User from 'app/models/user.model';
 
 export interface BaseUserRepo {
     create(data: any): Promise<User>;
 
-    findOne(query: any): Promise<User>;
+    findOne(query: any): Promise<User | null>;
 
     findAll(query: any): Promise<User[]>;
 
@@ -12,14 +14,8 @@ export interface BaseUserRepo {
     delete(query: any): Promise<boolean>;
 }
 
-// singleton class
-class UserRepo implements BaseUserRepo {
-    private static _instance: UserRepo;
-    private constructor() { }
-    public static get Instance() {
-        return this._instance || (this._instance = new this());
-    }
-
+@singleton()
+export class UserRepo implements BaseUserRepo {
     create = async (data: any): Promise<User> => {
         const user = await User.create(data);
 
@@ -55,8 +51,6 @@ class UserRepo implements BaseUserRepo {
     delete = async (query: any): Promise<boolean> => {
         const deletedNum = await User.destroy(query);
 
-        return deletedNum > 0 ? true : false;
+        return deletedNum > 0;
     }
 }
-
-export default UserRepo.Instance;

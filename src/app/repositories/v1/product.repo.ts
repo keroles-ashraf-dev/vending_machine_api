@@ -1,3 +1,4 @@
+import { singleton } from 'tsyringe';
 import Product from 'app/models/product.model';
 
 export interface BaseProductRepo {
@@ -12,14 +13,8 @@ export interface BaseProductRepo {
     delete(query: any): Promise<boolean>;
 }
 
-// singleton class
-class ProductRepo implements BaseProductRepo {
-    private static _instance: ProductRepo;
-    private constructor() { }
-    public static get Instance() {
-        return this._instance || (this._instance = new this());
-    }
-
+@singleton()
+export class ProductRepo implements BaseProductRepo {
     create = async (data: any): Promise<Product> => {
         const product = await Product.create(data);
 
@@ -55,8 +50,6 @@ class ProductRepo implements BaseProductRepo {
     delete = async (query: any): Promise<boolean> => {
         const deletedNum = await Product.destroy(query);
 
-        return deletedNum > 0 ? true : false;
+        return deletedNum > 0;
     }
 }
-
-export default ProductRepo.Instance;

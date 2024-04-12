@@ -1,25 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import { ApiError } from 'utils/error';
-import { ErrorType, HttpStatusCode, UserRole } from 'utils/type';
+import { inject, injectable, singleton } from 'tsyringe';
+import { ApiError } from 'helpers/error';
+import { ErrorType, HttpStatusCode } from 'utils/type';
 import apiRes from 'utils/api.response';
-import LoggerService from 'services/logger';
-import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import { Logger } from 'helpers/logger';
+import { BaseUserRepo } from 'app/repositories/v1/user.repo';
 
-class UserController {
-    private static _instance: UserController;
-    public static get Instance() {
-        return this._instance || (this._instance = new this(
-            new LoggerService('user.controller'), UserRepo,
-        ));
-    }
-    private constructor(logger: LoggerService, userRepo: BaseUserRepo) {
-        this.logger = logger;
-        this.userRepo = userRepo;
-    }
-
-    private logger: LoggerService;
-    private userRepo: BaseUserRepo;
+@injectable()
+@singleton()
+export class UserController {
+    constructor(
+        @inject('ProductLogger') private logger: Logger,
+        @inject('BaseUserRepo') private userRepo: BaseUserRepo,
+    ) { }
 
     createUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -69,7 +63,8 @@ class UserController {
 
     getUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
 
@@ -96,7 +91,8 @@ class UserController {
 
     updateUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
             const username = req.body.username;
             const password = req.body.password;
 
@@ -132,11 +128,13 @@ class UserController {
                     );
                 }
 
-                userData['username'] = username;
+                // @ts-ignore
+                userData.username = username;
             }
 
             if (password) {
-                userData['password'] = password;
+                // @ts-ignore
+                userData.password = password;
             }
 
             const modifiedUser = await this.userRepo.update(user, userData);
@@ -163,7 +161,8 @@ class UserController {
 
     deleteUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
             const password = req.body.password;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
@@ -204,5 +203,3 @@ class UserController {
         }
     }
 }
-
-export default UserController.Instance;

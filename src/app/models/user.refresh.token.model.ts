@@ -9,28 +9,28 @@ export default class UserRefreshToken extends Model {
     declare userId: number;
     declare expiryDate: Date;
 
-    static createToken = async (user: User) => {
+    static createToken = async (userId: number) => {
         const expiredAt = new Date();
 
         expiredAt.setMinutes(expiredAt.getMinutes() + jwt_refresh_expires_in_minutes);
 
         const refreshToken = await UserRefreshToken.create({
             token: ulid(),
-            userId: user.id,
+            userId: userId,
             expiryDate: expiredAt.getTime(),
         });
 
         return refreshToken.token;
     }
 
-    static verifyExpiration = (token: UserRefreshToken) => {
-        return token.expiryDate.getTime() > new Date().getTime();
+    static verifyExpiration = (expiryDate: Date) => {
+        return expiryDate.getTime() > new Date().getTime();
     }
 }
 
 UserRefreshToken.init({
     token: {
-        type: DataTypes.STRING(64),
+        type: DataTypes.UUID,
         unique: true, // i'm pretty sure the new inserted one gonna be unique because its ULID but
     },
     userId: {

@@ -1,44 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from 'utils/error';
+import { inject, injectable, singleton } from 'tsyringe';
+import { ApiError } from 'helpers/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 import apiRes from 'utils/api.response';
-import LoggerService from 'services/logger';
+import { Logger } from 'helpers/logger';
 import connection from 'db/connection';
 import { calcUserDepositAndChange, isDepositionAmountValid } from 'helpers/user.deposit';
-import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
-import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
-import CoinRepo, { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
+import { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import { BaseProductRepo } from 'app/repositories/v1/product.repo';
+import { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
 
-class DepositionController {
-    private static _instance: DepositionController;
-    public static get Instance() {
-        return this._instance || (this._instance = new this(
-            new LoggerService('deposition.controller'),
-            ProductRepo,
-            UserRepo,
-            CoinRepo,
-        ));
-    }
-    private constructor(
-        logger: LoggerService,
-        productRepo: BaseProductRepo,
-        userRepo: BaseUserRepo,
-        coinRepo: BaseCoinRepo,
-    ) {
-        this.logger = logger;
-        this.productRepo = productRepo;
-        this.userRepo = userRepo;
-        this.coinRepo = coinRepo;
-    }
-
-    private logger: LoggerService;
-    private productRepo: BaseProductRepo;
-    private userRepo: BaseUserRepo;
-    private coinRepo: BaseCoinRepo;
+@injectable()
+@singleton()
+export class DepositionController {
+    constructor(
+        @inject('DepositionLogger') private logger: Logger,
+        @inject('BaseCoinRepo') private coinRepo: BaseCoinRepo,
+        @inject('BaseUserRepo') private userRepo: BaseUserRepo,
+    ){}
 
     deposit = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
             const amount: number = req.body.amount;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
@@ -93,7 +77,8 @@ class DepositionController {
         const trans = await connection.transaction();
 
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
 
@@ -154,5 +139,3 @@ class DepositionController {
         }
     }
 }
-
-export default DepositionController.Instance;

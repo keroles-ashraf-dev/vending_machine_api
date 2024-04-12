@@ -4,27 +4,19 @@ import { envDev } from 'utils/constant';
 
 // logging format => date + logger level + message + {data}
 
-const dateTimeFormat = () => {
-    return new Date(Date.now()).toLocaleString;
-}
-
-const dateFormat = () => {
-    return new Date(Date.now()).toLocaleDateString;
-}
-
-class LoggerService {
+export class Logger {
     private logger: winston.Logger;
 
     constructor(route: string = 'general') {
         this.logger = winston.createLogger({
             level: 'info',
             format: winston.format.printf(info => {
-                let msg = dateTimeFormat + ' | ' + info.level.toUpperCase + ' | ' + info.message;
+                let msg = this.dateTimeFormat() + ' | ' + info.level.toUpperCase + ' | ' + info.message;
                 msg = info.data ? msg + ' | ' + JSON.stringify(info.data) : msg;
                 return msg;
             }),
             transports: [
-                new winston.transports.File({ filename: log_file_path + '/' + dateFormat() + '/' + route + '.log' }),
+                new winston.transports.File({ filename: log_file_path + '/' + this.dateFormat() + '/' + route + '.log' }),
             ],
         });
 
@@ -50,6 +42,13 @@ class LoggerService {
     error = async (msg: string, data: any = null) => {
         this.logger.log('error', msg, data);
     }
-}
 
-export default LoggerService;
+
+    private dateTimeFormat = () => {
+        return new Date(Date.now()).toLocaleString;
+    }
+
+    private dateFormat = () => {
+        return new Date(Date.now()).toLocaleDateString;
+    }
+}

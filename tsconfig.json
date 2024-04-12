@@ -1,13 +1,23 @@
 {
     "compilerOptions": {
         "module": "commonjs",
+        "target": "es2016",
         "esModuleInterop": true,
-        "target": "es6",
         "moduleResolution": "node",
-        "sourceMap": true,
+        "resolveJsonModule": true,
+        "noImplicitAny": true,
         "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "forceConsistentCasingInFileNames": true,
+        "alwaysStrict": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "removeComments": true,
-        "baseUrl": ".",
+        "baseUrl": "./",
         "rootDir": "./src/",
         "outDir": "./dist/",
         "paths": {
@@ -20,19 +30,23 @@
             "db/*": [
                 "./src/db/*"
             ],
+            "di/*": [
+                "./src/di/*"
+            ],
             "helpers/*": [
                 "./src/helpers/*"
             ],
-            "services/*": [
-                "./src/services/*"
-            ],
             "utils/*": [
                 "./src/utils/*"
-            ],
+            ]
         }
     },
+    "include": [
+        "./src/**/*.tsx",
+        "./src/**/*.ts"
+    ],
     "lib": [
-        "es2015"
+        "es2016"
     ],
     "ts-node": {
         "require": [

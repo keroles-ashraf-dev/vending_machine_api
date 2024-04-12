@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { ApiError } from 'utils/error';
+import { ApiError } from 'helpers/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 
 function validate(schema: Joi.Schema, property: string = 'body') {
   return (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.validate(req[property]);
+    // @ts-ignore
+    const result = schema.validate(req.property);
     const error = result.error;
 
     if (error) {

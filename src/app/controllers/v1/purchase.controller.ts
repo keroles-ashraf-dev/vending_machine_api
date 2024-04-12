@@ -1,29 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from 'utils/error';
+import { inject, injectable, singleton } from 'tsyringe';
+import { ApiError } from 'helpers/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 import apiRes from 'utils/api.response';
-import LoggerService from 'services/logger';
+import { Logger } from 'helpers/logger';
 import connection from 'db/connection';
 import { calcUserDepositAndChange } from 'helpers/user.deposit';
-import UserRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
-import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
-import CoinRepo, { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
+import { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import { BaseProductRepo } from 'app/repositories/v1/product.repo';
+import { BaseCoinRepo } from 'app/repositories/v1/coin.repo';
 
-class PurchaseController {
-    private static _instance: PurchaseController;
-    public static get Instance() {
-        return this._instance || (this._instance = new this(
-            new LoggerService('purchase.controller'),
-            ProductRepo,
-            UserRepo,
-            CoinRepo,
-        ));
-    }
-    private constructor(
-        logger: LoggerService,
-        productRepo: BaseProductRepo,
-        userRepo: BaseUserRepo,
-        coinRepo: BaseCoinRepo,
+@injectable()
+@singleton()
+export class PurchaseController {
+    constructor(
+        @inject('PurchaseLogger') private logger: Logger,
+        @inject('BaseCoinRepo') private coinRepo: BaseCoinRepo,
+        @inject('BaseUserRepo') private userRepo: BaseUserRepo,
+        @inject('BaseProductRepo') private productRepo: BaseProductRepo,
     ) {
         this.logger = logger;
         this.productRepo = productRepo;
@@ -31,16 +25,12 @@ class PurchaseController {
         this.coinRepo = coinRepo;
     }
 
-    private logger: LoggerService;
-    private productRepo: BaseProductRepo;
-    private userRepo: BaseUserRepo;
-    private coinRepo: BaseCoinRepo;
-
     buy = async (req: Request, res: Response, next: NextFunction) => {
         // First, start a transaction
         const trans = await connection.transaction();
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
             const productId = req.body.product_id;
             const amount: number = req.body.amount;
 
@@ -87,7 +77,7 @@ class PurchaseController {
 
             const userDepositAfterCharge = user.deposit - totalCost;
 
-            const coins = await this.coinRepo.findAll({ order: [ ['value', 'DESC'] ] });
+            const coins = await this.coinRepo.findAll({ order: [['value', 'DESC']] });
 
             // read function doc
             const { userDeposit, returnedCoins } = calcUserDepositAndChange(coins, userDepositAfterCharge);
@@ -139,5 +129,3 @@ class PurchaseController {
         }
     }
 }
-
-export default PurchaseController.Instance;

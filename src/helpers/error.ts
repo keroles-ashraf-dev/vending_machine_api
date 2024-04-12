@@ -1,9 +1,10 @@
 import { Response } from "express";
 import { env } from "../config/app.config";
-import { ErrorType, HttpStatusCode } from "./type";
-import { envDev } from "./constant";
+import { ErrorType, HttpStatusCode } from "../utils/type";
+import { envDev } from "../utils/constant";
 import apiRes from "./api.response";
-import LoggerService from "services/logger";
+import { inject, injectable, singleton } from "tsyringe";
+import { Logger } from "helpers/logger";
 
 class BaseError extends Error {
     name: string;
@@ -32,29 +33,22 @@ export class ApiError extends BaseError {
         name: string,
         code: HttpStatusCode,
         message: string,
-        isOperational: boolean,
+        isOperational: boolean = true,
     ) {
         super(name, code, message, isOperational);
     }
 }
 
-class ErrorHandler {
-    private static _instance: ErrorHandler;
-    public static get Instance() {
-        return this._instance || (this._instance = new this(new LoggerService()));
-    }
-
-    private constructor(logger: LoggerService) {
-        this.logger = logger;
-
+@singleton()
+@injectable()
+export class ErrorHandler {
+    constructor(@inject('GeneralLogger') private logger: Logger) {
         process.on('uncaughtException', (error: Error) => this.handle(null, error));
 
         process.on('unhandledRejection', function (reason: Error, p: Promise<unknown>) {
             throw reason;
         });
     }
-
-    private logger: LoggerService;
 
     private isTrustedError = (error: Error) => {
         if (error instanceof BaseError) {
@@ -86,5 +80,3 @@ class ErrorHandler {
         return apiRes(res, error.code, 'Failed', error.message, { error_stack: error.stack });
     }
 }
-
-export default ErrorHandler.Instance;

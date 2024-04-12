@@ -1,33 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from 'utils/error';
-import { ErrorType, HttpStatusCode, UserRole } from 'utils/type';
+import { inject, injectable, singleton } from 'tsyringe';
+import { ApiError } from 'helpers/error';
+import { ErrorType, HttpStatusCode } from 'utils/type';
 import apiRes from 'utils/api.response';
-import LoggerService from 'services/logger';
-import ProductRepo, { BaseProductRepo } from 'app/repositories/v1/product.repo';
-import userRepo, { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import { Logger } from 'helpers/logger';
+import { BaseProductRepo } from 'app/repositories/v1/product.repo';
+import { BaseUserRepo } from 'app/repositories/v1/user.repo';
 
-class ProductController {
-    private static _instance: ProductController;
-    public static get Instance() {
-        return this._instance || (this._instance = new this(
-            new LoggerService('product.controller'),
-            ProductRepo,
-            userRepo,
-        ));
-    }
-    private constructor(logger: LoggerService, productRepo: BaseProductRepo, userRepo: BaseUserRepo) {
-        this.logger = logger;
-        this.productRepo = productRepo;
-        this.userRepo = userRepo;
-    }
-
-    private logger: LoggerService;
-    private productRepo: BaseProductRepo;
-    private userRepo: BaseUserRepo;
+@injectable()
+@singleton()
+export class ProductController {
+    constructor(
+        @inject('ProductLogger') private logger: Logger,
+        @inject('BaseProductRepo') private productRepo: BaseProductRepo,
+        @inject('BaseUserRepo') private userRepo: BaseUserRepo,
+    ) { }
 
     createProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
 
             const name: string = req.body.name;
             const cost: string = req.body.cost;
@@ -106,7 +98,8 @@ class ProductController {
 
     updateProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
 
             const productId = req.body.product_id;
             const name: string = req.body.name;
@@ -155,13 +148,16 @@ class ProductController {
             const productData = {};
 
             if (name) {
-                productData['name'] = name;
+                // @ts-ignore
+                productData.name = name;
             }
             if (cost) {
-                productData['cost'] = cost;
+                // @ts-ignore
+                productData.cost = cost;
             }
             if (amountAvailable) {
-                productData['amountAvailable'] = amountAvailable;
+                // @ts-ignore
+                productData.amountAvailable = amountAvailable;
             }
 
             const modifiedProduct = await this.productRepo.update(product, productData);
@@ -191,7 +187,8 @@ class ProductController {
 
     deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req['_user']['id'];
+            // @ts-ignore
+            const userId = req._user.id;
             const productId = req.body.product_id;
 
             const user = await this.userRepo.findOne({ where: { id: userId } });
@@ -250,5 +247,3 @@ class ProductController {
         }
     }
 }
-
-export default ProductController.Instance;
