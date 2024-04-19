@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { inject, injectable, singleton } from 'tsyringe';
 import UserRefreshToken from 'app/models/user.refresh.token.model';
 import { BaseUserRepo } from 'app/repositories/v1/user.repo';
 import { BaseUserRefreshTokenRepo } from 'app/repositories/v1/user.refresh.token.repo';
@@ -7,7 +8,6 @@ import { ApiError } from 'helpers/error';
 import { BaseJWT } from 'helpers/jwt';
 import { ErrorType, HttpStatusCode } from 'utils/type';
 import User from 'app/models/user.model';
-import { inject, injectable, singleton } from 'tsyringe';
 
 @injectable()
 @singleton()

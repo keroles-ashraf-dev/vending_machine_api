@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { inject, injectable, singleton } from 'tsyringe';
 import { AuthService } from 'app/services/v1/auth.service';
 import { HttpStatusCode } from 'utils/type';
-import apiRes from 'utils/api.response';
+import apiRes from 'helpers/api.response';
 import { Logger } from 'helpers/logger';
 
 @injectable()
@@ -10,7 +10,7 @@ import { Logger } from 'helpers/logger';
 export class AuthController {
     constructor(
         @inject('AuthLogger') private logger: Logger,
-        @inject(AuthService) private authServie: AuthService,
+        @inject(AuthService) private authService: AuthService,
     ) { }
 
     login = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +18,7 @@ export class AuthController {
             const username = req.body.username;
             const password = req.body.password;
 
-            const data = await this.authServie.login(username, password);
+            const data = await this.authService.login(username, password);
 
             const resData = {
                 id: data.user.id,
@@ -39,7 +39,7 @@ export class AuthController {
         try {
             const refreshToken = req.body.refresh_token;
 
-            const data = await this.authServie.refreshToken(refreshToken);
+            const data = await this.authService.refreshToken(refreshToken);
 
             const resData = {
                 id: data.user.id,

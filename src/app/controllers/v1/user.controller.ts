@@ -1,61 +1,31 @@
 import { Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcryptjs';
 import { inject, injectable, singleton } from 'tsyringe';
-import { ApiError } from 'helpers/error';
-import { ErrorType, HttpStatusCode } from 'utils/type';
-import apiRes from 'utils/api.response';
+import { HttpStatusCode } from 'utils/type';
+import apiRes from 'helpers/api.response';
 import { Logger } from 'helpers/logger';
-import { BaseUserRepo } from 'app/repositories/v1/user.repo';
+import { UserService } from 'app/services/v1/user.service';
 
 @injectable()
 @singleton()
 export class UserController {
     constructor(
-        @inject('ProductLogger') private logger: Logger,
-        @inject('BaseUserRepo') private userRepo: BaseUserRepo,
+        @inject('UserLogger') private logger: Logger,
+        @inject(UserService) private userService: UserService,
     ) { }
 
     createUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const username: string = req.body.username;
-            const password: string = req.body.password;
-            const role: string = req.body.role;
+            const data = await this.userService.createUser(req.body);
 
-            const isUsernameExist = await this.userRepo.findOne({ where: { username: username } });
-
-            if (isUsernameExist) {
-                throw new ApiError(
-                    ErrorType.GENERAL_ERROR,
-                    HttpStatusCode.OK,
-                    'Username is exist', true
-                );
-            }
-
-            const userData = {
-                username: username,
-                password: password,
-                role: role,
-            }
-
-            const user = await this.userRepo.create(userData);
-
-            if (!user) {
-                throw new ApiError(
-                    ErrorType.UNKNOWN_ERROR,
-                    HttpStatusCode.INTERNAL_SERVER_ERROR,
-                    'User not created. something wrong happend, try again later', true
-                );
-            }
-
-            const resData = {
-                id: user.id,
-                username: user.username,
-                role: user.role,
+            const resData: Record<string, any> = {
+                id: data.id,
+                username: data.username,
+                role: data.role,
             }
 
             this.logger.error('User creating succeeded', resData);
 
-            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user created', null, resData);
+            return apiRes(res, HttpStatusCode.CREATED, 'Successfully user created', null, resData);
         } catch (err) {
             next(err); // Pass error to error-handler middleware
         }
@@ -66,24 +36,15 @@ export class UserController {
             // @ts-ignore
             const userId = req._user.id;
 
-            const user = await this.userRepo.findOne({ where: { id: userId } });
-
-            if (!user) {
-                throw new ApiError(
-                    ErrorType.SECURITY_ERROR,
-                    HttpStatusCode.FORBIDDEN,
-                    'User not found in db after authentication succeeded',
-                    true
-                );
-            }
+            const data = await this.userService.getUser(userId);
 
             const resData = {
-                username: user.username,
-                role: user.role,
-                deposit: user.deposit,
+                username: data.username,
+                role: data.role,
+                deposit: data.deposit,
             }
 
-            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user fetched', null, resData);
+            return apiRes(res, HttpStatusCode.CREATED, 'Successfully user fetched', null, resData);
         } catch (err) {
             next(err); // Pass error to error-handler middleware
         }
@@ -91,69 +52,22 @@ export class UserController {
 
     updateUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // @ts-ignore
-            const userId = req._user.id;
-            const username = req.body.username;
-            const password = req.body.password;
-
-            if (!username && !password) {
-                throw new ApiError(
-                    ErrorType.GENERAL_ERROR,
-                    HttpStatusCode.OK,
-                    'Nothing to update', true
-                );
-            }
-
-            const user = await this.userRepo.findOne({ where: { id: userId } });
-
-            if (!user) {
-                throw new ApiError(
-                    ErrorType.SECURITY_ERROR,
-                    HttpStatusCode.FORBIDDEN,
-                    'User not found in db after authentication succeeded',
-                    true
-                );
-            }
-
-            const userData = {};
-
-            if (username) {
-                const isUsernameExist = await this.userRepo.findOne({ where: { username: username } });
-
-                if (isUsernameExist) {
-                    throw new ApiError(
-                        ErrorType.GENERAL_ERROR,
-                        HttpStatusCode.OK,
-                        'Username is exist', true
-                    );
-                }
-
+            const userData = {
                 // @ts-ignore
-                userData.username = username;
+                id: req._user.id,
+                username: req.body.username,
+                password: req.body.password,
             }
 
-            if (password) {
-                // @ts-ignore
-                userData.password = password;
-            }
-
-            const modifiedUser = await this.userRepo.update(user, userData);
-
-            if (!modifiedUser) {
-                throw new ApiError(
-                    ErrorType.UNKNOWN_ERROR,
-                    HttpStatusCode.INTERNAL_SERVER_ERROR,
-                    'User not updated. something wrong happend, try again later', true
-                );
-            }
+            const data = await this.userService.updateUser(userData);
 
             const resData = {
-                id: modifiedUser.id,
-                username: modifiedUser.username,
-                role: modifiedUser.role,
+                id: data.id,
+                username: data.username,
+                role: data.role,
             }
 
-            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user updated', null, resData);
+            return apiRes(res, HttpStatusCode.CREATED, 'Successfully user updated', null, resData);
         } catch (err) {
             next(err); // Pass error to error-handler middleware
         }
@@ -161,43 +75,21 @@ export class UserController {
 
     deleteUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // @ts-ignore
-            const userId = req._user.id;
-            const password = req.body.password;
-
-            const user = await this.userRepo.findOne({ where: { id: userId } });
-
-            if (!user) {
-                throw new ApiError(
-                    ErrorType.SECURITY_ERROR,
-                    HttpStatusCode.FORBIDDEN,
-                    'User not found in db after authentication succeeded',
-                    true
-                );
+            const userData = {
+                // @ts-ignore
+                id: req._user.id,
+                password: req.body.password,
             }
 
-            if (!(await bcrypt.compare(password, user.password))) {
-                throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.FORBIDDEN, 'Invalid password', true);
-            }
-
-            const deleted = await this.userRepo.delete({ where: { id: user.id } });
-
-            if (!deleted) {
-                throw new ApiError(
-                    ErrorType.UNKNOWN_ERROR,
-                    HttpStatusCode.INTERNAL_SERVER_ERROR,
-                    'User not deleted. try again later',
-                    true
-                );
-            }
+            const data = await this.userService.deleteUser(userData);
 
             const resData = {
-                username: user.username,
+                username: data.username,
             }
 
             this.logger.error('User deleting succeeded', resData);
 
-            return apiRes(res, HttpStatusCode.CREATED, 'Sucessfully user deleted', null, resData);
+            return apiRes(res, HttpStatusCode.CREATED, 'Successfully user deleted', null, resData);
         } catch (err) {
             next(err); // Pass error to error-handler middleware
         }
