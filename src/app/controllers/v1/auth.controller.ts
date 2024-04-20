@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Request, Response, NextFunction } from 'express';
 import { inject, injectable, singleton } from 'tsyringe';
 import { AuthService } from 'app/services/v1/auth.service';

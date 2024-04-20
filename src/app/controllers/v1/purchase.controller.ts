@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Request, Response, NextFunction } from 'express';
 import { inject, injectable, singleton } from 'tsyringe';
 import { ApiError } from 'helpers/error';
