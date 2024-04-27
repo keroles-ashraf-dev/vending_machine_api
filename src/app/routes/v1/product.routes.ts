@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { container } from 'tsyringe';
 import {ProductController} from 'app/controllers/v1/product.controller'
-import validate from 'app/middelwares/validate';
+import validate from 'app/middlewares/validate';
 import { createSchema, getSchema, updateSchema, deleteSchema } from 'app/validations/product.validation';
-import authenticate from 'app/middelwares/authenticate';
-import authorize from 'app/middelwares/authorize';
+import authenticate from 'app/middlewares/authenticate';
+import authorize from 'app/middlewares/authorize';
 import { UserRole } from 'utils/type';
 
 const router = Router();

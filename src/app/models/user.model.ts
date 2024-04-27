@@ -1,6 +1,6 @@
 import { Model, DataTypes, CreateOptions } from 'sequelize';
 import bcrypt from 'bcryptjs';
-import conn from '../../db/connection';
+import conn from '../../db/postgres';
 import { UserRole } from '../../utils/type';
 
 export default class User extends Model {

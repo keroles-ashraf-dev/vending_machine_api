@@ -3,15 +3,16 @@ import { container } from "tsyringe";
 import 'di/register';
 import app from './app/app';
 import { port } from 'config/app.config';
-import connection from 'db/connection';
 import { Logger } from "helpers/logger";
+import Sequelize from "sequelize/types/sequelize";
 
 const logger: Logger = container.resolve('GeneralLogger');
+const postgres: Sequelize = container.resolve('Postgres');
 
 function start(): void {
     try {
         app.listen(port, async (): Promise<void> => {
-            await connection.sync();
+            await postgres.sync();
 
             logger.info('Server started on port ' + port);
         });

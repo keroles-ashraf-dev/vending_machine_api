@@ -6,6 +6,7 @@ export enum HttpStatusCode {
     FORBIDDEN = 403,
     NOT_FOUND = 404,
     UNPROCESSABLE_CONTENT = 422,
+    TOO_MANY_REQUESTS = 429,
     INTERNAL_SERVER_ERROR = 500,
 }
 
@@ -14,6 +15,7 @@ export enum ErrorType {
     UNKNOWN_ERROR = 'UNKNOWN_ERROR',
     VALIDATION_ERROR = 'VALIDATION_ERROR',
     SECURITY_ERROR = 'SECURITY_ERROR',
+    SERVER_ERROR = 'SERVER_ERROR',
 }
 
 export enum UserRole {

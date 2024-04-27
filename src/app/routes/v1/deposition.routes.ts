@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { container } from 'tsyringe';
 import {DepositionController} from 'app/controllers/v1/deposition.controller'
-import authenticate from 'app/middelwares/authenticate';
-import authorize from 'app/middelwares/authorize';
+import authenticate from 'app/middlewares/authenticate';
+import authorize from 'app/middlewares/authorize';
 import { UserRole } from 'utils/type';
 
 const router = Router();

@@ -1,6 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import { ulid } from 'ulid';
-import conn from '../../db/connection';
+import conn from '../../db/postgres';
 import User from './user.model';
 import { jwt_refresh_expires_in_minutes } from 'config/app.config';
 

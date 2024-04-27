@@ -58,21 +58,21 @@ export class ErrorHandler {
         return false;
     }
 
-    handle = (res: Response | null, error: Error) => {
+    public handle = (res: Response | null, error: Error) => {
         this.logger.error('Error', error);
 
         if (!this.isTrustedError(error) || res == null) {
-            // its not operatioal error
+            // its not operational error
             return process.exit(1);
         }
 
         if (env != envDev) {
             error.stack = undefined;
 
-            // its not development enviroment
-            if (error.name == ErrorType.SECURITY_ERROR) {
-                // maybe this one should be send to (email, slack, etc)
-                error.message = 'Something wrong happend, try again later';
+            // its not development environment
+            if (error.name == ErrorType.SECURITY_ERROR || error.name == ErrorType.SERVER_ERROR) {
+                // maybe this one should be sent to (email, slack, etc)
+                error.message = 'Something wrong happened, try again later';
             }
         }
 

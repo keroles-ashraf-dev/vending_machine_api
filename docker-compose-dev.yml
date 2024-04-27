@@ -15,6 +15,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
   postgres:
     container_name: postgres_container
     image: postgres:15.5
@@ -37,9 +39,28 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  redis:
+    container_name: redis_container
+    image: redis:7.2.4-alpine3.19
+    restart: always
+    env_file:
+      - .env
+    environment:
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - app_redis_vol:/var/lib/redis
+      - app_redis_config_vol:/usr/local/etc/redis/redis.conf
+    ports:
+      - ${REDIS_PORT}:6379
+    networks:
+      - backend
+    command: redis-server --save 20 1 --loglevel warning
 
 networks:
   backend:
 
 volumes:
   app_postgres_vol:
+  app_redis_vol:
+  app_redis_config_vol:

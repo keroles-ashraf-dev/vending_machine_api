@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { container } from 'tsyringe';
 import { UserController } from 'app/controllers/v1/user.controller'
-import validate from 'app/middelwares/validate';
+import validate from 'app/middlewares/validate';
 import { createSchema, updateSchema, deleteSchema } from 'app/validations/user.validation';
-import authenticate from 'app/middelwares/authenticate';
+import authenticate from 'app/middlewares/authenticate';
 
 const router = Router();
 const userCtrl = container.resolve(UserController);
