@@ -9,7 +9,8 @@ import productRoutes from 'app/routes/v1/product.routes';
 import purchaseRoutes from 'app/routes/v1/purchase.routes';
 import userRoutes from 'app/routes/v1/user.routes';
 import { client_origin_url } from 'config/app.config';
-import errorCatch from './middelwares/error_catch';
+import errorCatch from './middlewares/error_catch';
+import rateLimiting from './middlewares/rate.limiting';
 
 const app = express();
 
@@ -23,7 +24,7 @@ app.use(
         allowedHeaders: '*' // or specify the allowed headers
     })
 );
-
+app.use(rateLimiting); // set rate limiting middleware
 
 app.use('/api/v1', authRoutes);
 app.use('/api/v1', coinRoutes);

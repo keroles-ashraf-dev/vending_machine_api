@@ -1,3 +1,4 @@
+import { singleton } from 'tsyringe';
 import Coin from 'app/models/coin.model';
 
 export interface BaseCoinRepo {
@@ -8,14 +9,8 @@ export interface BaseCoinRepo {
     findAll(query: any): Promise<Coin[]>;
 }
 
-// singleton class
-class CoinRepo implements BaseCoinRepo {
-    private static _instance: CoinRepo;
-    private constructor() { }
-    public static get Instance() {
-        return this._instance || (this._instance = new this());
-    }
-
+@singleton()
+export class CoinRepo implements BaseCoinRepo {
     create = async (data: any): Promise<Coin> => {
         const coin = await Coin.create(data);
 
@@ -34,5 +29,3 @@ class CoinRepo implements BaseCoinRepo {
         return coins;
     }
 }
-
-export default CoinRepo.Instance;

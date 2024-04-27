@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from 'utils/error';
+import { ApiError } from 'helpers/error';
 import { ErrorType, HttpStatusCode, UserRole } from 'utils/type';
 
 function authorize(roles: UserRole[]) {
     return (req: Request, res: Response, next: NextFunction) => {
-        const userRole: string = req['_user']['role'];
+        // @ts-ignore
+        const userRole: string = req._user.role;
 
         if (!roles.find((role) => role == userRole)) {
             throw new ApiError(

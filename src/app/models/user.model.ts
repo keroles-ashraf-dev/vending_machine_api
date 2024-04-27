@@ -1,9 +1,7 @@
 import { Model, DataTypes, CreateOptions } from 'sequelize';
 import bcrypt from 'bcryptjs';
-import conn from '../../db/connection';
+import conn from '../../db/postgres';
 import { UserRole } from '../../utils/type';
-import Product from './product.model';
-import UserRefreshToken from './user.refresh.token.model';
 
 export default class User extends Model {
     declare id: number;

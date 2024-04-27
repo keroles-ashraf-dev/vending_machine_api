@@ -1,24 +1,21 @@
-import User from 'app/models/user.model';
+import "reflect-metadata";
+import { singleton } from 'tsyringe';
 import UserRefreshToken from 'app/models/user.refresh.token.model';
 
 export interface BaseUserRefreshTokenRepo {
-    create(user: User): Promise<string>;
+    create(userId: number): Promise<string>;
 
     findOne(query: any): Promise<UserRefreshToken>;
 
-    verifyExpiration(userrefreshtoken: UserRefreshToken): boolean;
+    verifyExpiration(expiryDate: Date): boolean;
+
+    delete(query: any): Promise<boolean>;
 }
 
-// singleton class
-class UserRefreshTokenRepo implements BaseUserRefreshTokenRepo {
-    private static _instance: UserRefreshTokenRepo;
-    private constructor() { }
-    public static get Instance() {
-        return this._instance || (this._instance = new this());
-    }
-
-    create = async (user: User): Promise<string> => {
-        const token = await UserRefreshToken.createToken(user);
+@singleton() 
+export class UserRefreshTokenRepo implements BaseUserRefreshTokenRepo {
+    create = async (userId: number): Promise<string> => {
+        const token = await UserRefreshToken.createToken(userId);
 
         return token;
     }
@@ -29,11 +26,15 @@ class UserRefreshTokenRepo implements BaseUserRefreshTokenRepo {
         return userrefreshtoken;
     }
 
-    verifyExpiration = (token: UserRefreshToken): boolean => {
-        const valid = UserRefreshToken.verifyExpiration(token);
+    verifyExpiration = (expiryDate: Date): boolean => {
+        const valid = UserRefreshToken.verifyExpiration(expiryDate);
 
         return valid;
     }
-}
 
-export default UserRefreshTokenRepo.Instance;
+    delete = async (query: any): Promise<boolean> => {
+        const deletedNum = await UserRefreshToken.destroy(query);
+
+        return deletedNum > 0;
+    }
+}

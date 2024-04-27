@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import conn from '../../db/connection';
+import conn from '../../db/postgres';
 import User from './user.model';
 
 export default class Product extends Model {

@@ -9,9 +9,12 @@ function apiRes(
 ) {
     const resData = {};
 
-    if (msg) resData['message'] = msg;
-    if (error) resData['error'] = error;
-    if (data) resData['data'] = data;
+    // @ts-ignore
+    if (msg) resData.message = msg;
+    // @ts-ignore
+    if (error) resData.error = error;
+    // @ts-ignore
+    if (data) resData.data = data;
 
     return res.status(code).send(resData);
 }
