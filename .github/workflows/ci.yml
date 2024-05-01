@@ -4,6 +4,13 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - src/**
+  push:
+    branches:
+      - main
+    paths:
+      - src/**
 
 defaults:
   run:
@@ -16,7 +23,7 @@ jobs:
     name: Run unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         name: Checkout repository
 
       - name: Instal dependecies
@@ -25,9 +32,9 @@ jobs:
       - name: Run tests
         run: npm run test
 
-  # code analysis using sonarQube
+  # code scanning using sonarQube
   sonarqube:
-    name: SonarQube Integration
+    name: SonarQube code scanning
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,35 +46,5 @@ jobs:
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} //Sonar Token generated
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} example URL (https://sq.bswlog.co.in/)
-
-  # deploy to staging
-  deploy:
-    environment: staging
-    name: Deploy to staging
-    runs-on: ubuntu-latest
-    needs: [test, sonarqube]
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout repository
-
-      - name: Checkout repository
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avzr --delete
-          path: src/
-          remote_path: /var/app
-          remote_host: ${{ secrets.HOST_NAME }}
-          remote_user: ${{ secrets.REMOTE_USER }}
-          remote_key: ${{ secrets.SSH_KEY }}
-      
-      - name: Execute SSH commmands on remote server
-        uses: JimCronqvist/action-ssh@master
-        with:
-          hosts: '${{ secrets.REMOTE_USER }}@${{ secrets.HOST_NAME }}'
-          privateKey: ${{ secrets.SSH_KEY }}
-          command: |
-            cd /va/app
-            cp .env.example .env
-            docker-compose -f docker-compose.yml -f docker-compose-prod.yml up --build
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

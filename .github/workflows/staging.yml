@@ -1,0 +1,189 @@
+name: Create staging env
+
+on:
+  workflow_dispatch:
+    inputs:
+      PR_number:
+        description: Pull request number
+        required: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: .
+
+jobs:
+  create:
+    name: Create staging and deploy
+    runs-on: ubuntu-latest
+    steps:
+      # verify pull request number
+      - name: Verify pull request number
+        uses: actions/github-script@v7
+        id: verify_pr_number
+        with:
+          github-token: ${{ secrets.APPLICATION_GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            const res = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.epo,
+              pull_number: ${{ github.event.inputs.PR_number }},
+            });
+
+            if(res.data.number !== ${{ github.event.inputs.PR_number }}){
+              throw new Error('Pull request is not open or not valid');
+            }
+
+            console.log('PR ref: ' + res.data.head.ref);
+            return res.data.head.ref;
+
+      # checkout infra repo
+      - name: Checkout infra repository
+        uses: actions/checkout@v4
+        with:
+          repository: keroles-ashraf-dev/vending_machine_infra
+          ref: main
+          token: ${{ secrets.INFRA_REPO_GITHUB_TOKEN }}
+
+      # setup terraform
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.4"
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      # create staging env resource file
+      - name: Create staging env resource file
+        id: create_resource_file
+        working-directory: instances/staging/
+        run: |
+          OUTPUT="$(./create_staging_resource.sh PR_${{ github.event.inputs.PR_number }} | jq -r .terraform_expected_output)"
+          echo "::set-output name=STAGING_RESOURCE_NAME::$OUTPUT"
+
+      # terraform Init and Validate
+      - name: Terraform Init and Validate
+        id: init
+        working-directory: instances/staging/
+        run: |
+          terraform init
+          terraform validate -no-color
+
+      # terraform Plan
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        working-directory: instances/staging/
+        continue-on-error: true
+
+      # update the PR with the results of the plan
+      - name: Update Pull Request
+        uses: actions/github-script@v7
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.INFRA_REPO_GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Initialization \`${{ steps.init.outcome }}\`
+            #### Terraform Plan \`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.inputs.PR_number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      # if plan failed -> exit
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      # apply terraform plan
+      - name: Terraform Apply
+        id: apply
+        working-directory: instances/staging/
+        run: terraform apply -auto-approve
+
+      # fetsh public dns of instance
+      - name: Terraform Output
+        id: apply_output
+        working-directory: instances/staging/
+        run: terraform output -raw -no-color ${{ steps.create_resource_file.outputs.STAGING_RESOURCE_NAME }}
+
+      # commit the new resource file and push it to the infra repo
+      - name: Commit terraform resource files to the PR
+        working-directory: instances/staging/
+        run: |
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor}}@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.INFRA_REPO_GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git add ./\*.tf
+          git commit -m "Add terraform resource files" && \
+          git push || echo "Nothing to commit"
+
+      # checkout application repo the PR branch so that we can deploy it
+      - name: Checkout application repository
+        uses: actions/checkout@v4
+        with:
+          repository: keroles-ashraf-dev/vending_machine_api
+          ref: ${{ steps.verify_pr_number.outputs.result }}
+          token: ${{ secrets.APPLICATION_GITHUB_TOKEN }}
+
+      # sync the files in this directory to the staging
+      - uses: burnett01/rsync-deployments@7.0.1
+        name: "Deploy to staging"
+        with:
+          switches: -avzr --delete
+          path: .
+          remote_path: /var/app
+          remote_host: ${{ steps.apply_output.outputs.stdout }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Once we have the new files synced to the staging server
+      # we need to start our app.
+      - uses: JimCronqvist/action-ssh@master
+        name: Execute SSH commmands on remote server
+        with:
+          hosts: "${{ secrets.REMOTE_USER }}@${{ steps.apply_output.outputs.stdout }}"
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+          command: |
+            cd /var/app
+            cp .env.example .env
+            docker-compose -f docker-compose.yml -f docker-compose-prod.yml up --build
+
+      # When we're done, we need to update the PR one more time
+      # with the results of the apply.
+      - name: Update status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.APPLICATION_GITHUB_TOKEN }}
+          script: |
+            const output = `#### Staging server created
+            > PR #${{ github.event.inputs.PR_number }} has been deployed successfully
+
+            URL: http://${{ steps.apply_output.outputs.stdout }}`;
+
+            github.rest.issues.createComment({
+              issue_number: ${{ github.event.inputs.PR_number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      # ssh to the staging server and execute commands
+      # on the server in case any of the steps above fail.
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
